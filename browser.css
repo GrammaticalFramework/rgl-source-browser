@@ -1,0 +1,45 @@
+/* https://www.w3schools.com/howto/howto_css_loader.asp */
+#loader {
+  position: fixed;
+  top: 45%;
+  left: 45%;
+  z-index: 100;
+  border: 24px solid #f3f3f3;
+  border-top: 24px solid #6c757d;
+  border-radius: 50%;
+  width: 160px;
+  height: 160px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: ew-resize;
+}
+
+.gutter.gutter-vertical {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+  cursor: ns-resize;
+}
+
+
+.list-group-item {
+  padding: 0.5rem 0.75rem;
+  font-size: 90%;
+}
+.list-group-item.directory {
+  font-style: italic;
+}
+.list-group-item.module {
+  padding-left: 3rem;
+}
