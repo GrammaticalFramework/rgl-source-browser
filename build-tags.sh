@@ -7,8 +7,9 @@
 datadir="data"
 tagsdir="${datadir}/tags"
 srcdir="${datadir}/src"
-index="${datadir}/index.json"
-ignore="demo old-demo tmp"
+index="${datadir}/index.tmp.json"
+index_final="${datadir}/index.json"
+ignore="demo experimental"
 start=$(date +%s)
 
 # Set stat command based on OS
@@ -90,6 +91,7 @@ do
     fi
 done
 printf "\n  }\n}\n" >> "$index"
+mv "$index" "$index_final"
 
 # Replace all paths
 echo "Replacing paths..."
