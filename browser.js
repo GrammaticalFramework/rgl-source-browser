@@ -213,36 +213,26 @@ function App (oninit) {
       }
       menu.find('a.directory').click(function () {
         var elem = $(this)
-        var icon = elem.find('i.fas')
         if (elem.attr('data-status') === 'open') {
-          elem.attr('data-status', 'closed')
-          icon.removeClass('fa-folder-open').addClass('fa-folder')
+          t.setMenuDirectoryState(elem, 'closed')
           menu.find('.module[data-language=' + elem.attr('data-language') + ']').hide()
         } else {
-          elem.attr('data-status', 'open')
-          icon.removeClass('fa-folder').addClass('fa-folder-open')
+          t.setMenuDirectoryState(elem, 'open')
           menu.find('.module[data-language=' + elem.attr('data-language') + ']').show()
         }
         return false
       })
 
       // Module search box
-      $('<input>')
-        .attr('id', 'module_search')
-        .keyup(function () {
-          t.searchModule($(this).val())
-        })
-        .appendTo('#languages')
-      $('<a>')
-        .attr('href', '#')
-        .click(t.clearSearchModule)
-        .html('Clear')
-        .appendTo('#languages')
+      $('#module-search').keyup(delay(function () {
+        t.searchModule($(this).val())
+      }, 500))
 
+      // TODO
       // Recent modules
-      $('<div>')
-        .attr('id', 'recent')
-        .appendTo('#languages')
+      // $('<div>')
+      //   .attr('id', 'recent')
+      //   .appendTo('#languages')
 
       // Initialize API results
       t.initAPI()
@@ -258,6 +248,17 @@ function App (oninit) {
       alert('Error getting index.')
     }
   })
+
+  this.setMenuDirectoryState = function (objOrSel, state) {
+    var elem = (typeof objOrSel === 'string') ? $('#menu .directory[data-language=' + objOrSel + ']') : objOrSel
+    var icon = elem.find('i.fas')
+    elem.attr('data-status', state)
+    if (state === 'closed') {
+      icon.removeClass('fa-folder-open').addClass('fa-folder')
+    } else if (state === 'open') {
+      icon.removeClass('fa-folder').addClass('fa-folder-open')
+    }
+  }
 
   // ===== Loading functionality =====
 
@@ -447,29 +448,33 @@ function App (oninit) {
     if (!s) {
       return t.clearSearchModule()
     }
-    $('#language_select').hide()
-    $('#modules').empty()
-    for (var lang in t.state.index['languages']) {
-      var modules = t.state.index['languages'][lang]
-      for (var module of modules) {
-        var fullModule = lang + '/' + module
-        if (fullModule.toLowerCase().indexOf(s.toLowerCase()) === -1) continue
-        $('<a>')
-          .html(fullModule)
-          .attr('href', '#' + lang + '/' + module + '.gf')
-          .appendTo('#modules')
+    t.showLoading()
+    $('#menu .directory').hide()
+    var langsToShow = []
+    $('#menu .module').hide().each(function () {
+      var elem = $(this)
+      if (elem.attr('data-module').toLowerCase().indexOf(s.toLowerCase()) > -1) {
+        elem.show()
+        if (!langsToShow.includes(elem.attr('data-language'))) langsToShow.push(elem.attr('data-language'))
       }
+    })
+    for (var lang of langsToShow) {
+      var dir = $('#menu .directory[data-language=' + lang + ']')
+      dir.show()
+      t.setMenuDirectoryState(dir, 'open')
     }
+    t.hideLoading()
   }
 
   this.clearSearchModule = function () {
-    $('#module_search').val('')
-    $('#language_select').show()
-    t.setLanguage(t.state.language)
-    return false
+    $('#menu .directory').show().each(function (x, m) { t.setMenuDirectoryState($(m), 'closed') })
+    $('#menu .module').hide()
+    $('#menu .directory[data-language=' + t.state.current.language + ']').trigger('click')
   }
 
   // ===== Filtering of scope info =====
+
+  // TODO
 
   // Custom selector
   $.expr[':'].match = function (a, b, c) {
@@ -534,7 +539,9 @@ function App (oninit) {
   $('#scope #show_all').change(t.runFilter)
   $('#scope #show_local').change(t.runFilter)
 
-  // ===== API search =====
+  // ===== API filter =====
+
+  // TODO
 
   // Custom selector
   $.expr[':'].matchAPI = function (a, b, c) {
@@ -591,4 +598,21 @@ function App (oninit) {
       .focus()
     t.runFilterAPI()
   })
+}
+
+// ===== Helpers =====
+
+// Delay event-handler and avoid multiple calls before timeout
+// Specifically for waiting until user input pauses before searching
+// https://stackoverflow.com/a/1909508/98600
+function delay (callback, ms) {
+  var timer = 0
+  return function () {
+    var context = this
+    var args = arguments
+    clearTimeout(timer)
+    timer = setTimeout(function () {
+      callback.apply(context, args)
+    }, ms || 0)
+  }
 }
