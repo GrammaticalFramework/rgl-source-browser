@@ -93,7 +93,8 @@ printf "\n  }\n}\n" >> "$index"
 
 # Replace all paths
 echo "Replacing paths..."
-sed -i '' "s!${basedir}/!!;s!${tagsdir}/!!;" "$tagsdir"/*.gf-tags
+sed -i.bak "s!${basedir}/!!;s!${tagsdir}/!!;" "$tagsdir"/*.gf-tags
+rm -f "$tagsdir"/*.gf-tags.bak
 
 # TODO: renaming of
 # AdN	indir	CatAra		Z:\Users\john\repositories\gf-rgl\src\common\CommonX.gf-tags
