@@ -30,14 +30,7 @@
               <input type="text" class="form-control" placeholder="Module" aria-label="Module">
             </div>
           </form>
-          <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action directory"><i class="fas fa-folder-open"></i> german</a>
-            <a href="#" class="list-group-item list-group-item-action module">CatGer</a>
-            <a href="#" class="list-group-item list-group-item-action module">ResGer</a>
-            <a href="#" class="list-group-item list-group-item-action directory"><i class="fas fa-folder-open"></i> swedish</a>
-            <a href="#" class="list-group-item list-group-item-action module">CatSwe</a>
-            <a href="#" class="list-group-item list-group-item-action module">ResSwe</a>
-          </div>
+          <nav class="list-group" id="module-menu"></nav>
         </div>
         <div class="col-10 pt-3" id="col-main">
 
@@ -54,11 +47,11 @@
             <li class="nav-item">
               <a class="nav-link" id="tab-api" data-toggle="tab" href="#api" role="tab" aria-controls="api" aria-selected="false">API</a>
             </li>
-            <li class="nav-item" id="loading">
-              <i class="fas fa-circle-notch fa-spin text-danger m-2" style="font-size:1.5em"></i>
-            </li>
             <li class="nav-item">
               <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
+            </li>
+            <li class="nav-item" id="loading">
+              <i class="fas fa-circle-notch fa-spin text-danger mt-2" style="font-size:1.5em"></i>
             </li>
             <li class="nav-item ml-auto">
               <div class="text-muted small text-right py-0">
@@ -82,7 +75,7 @@
                   <input type="text" class="form-control" placeholder="Filter" aria-label="Module">
                 </div>
                 <div class="mx-2">
-                  xyz items
+                  <span id="count">&hellip;</span> items
                 </div>
                 <button type="button" class="btn btn-secondary mx-2">Clear</button>
                 <div class="form-check mx-2">
@@ -104,11 +97,10 @@
                     <th scope="col">Identifier</th>
                     <th scope="col">Judgement Type</th>
                     <th scope="col">Module</th>
-                    <th scope="col">?</th>
                     <th scope="col">Function Type</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="results">
                 </tbody>
               </table>
             </div>

@@ -1,3 +1,9 @@
+#col-menu {
+  height: calc(100vh);
+  overflow-y: scroll;
+}
+
+
 .gutter {
   background-color: #eee;
   background-repeat: no-repeat;
@@ -16,15 +22,16 @@
 
 
 .list-group-item {
-  padding: 0.5rem 0.75rem;
-  /* font-size: 90%; */
+  padding: 0.3rem 0.5rem;
+  font-size: 90%;
 }
 .list-group-item.directory {
   font-style: italic;
 }
 .list-group-item.module {
-  padding-left: 3rem;
+  padding-left: 2.5rem;
 }
 
-.code {
+.table td, .table th {
+  padding: .5rem;
 }

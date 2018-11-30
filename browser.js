@@ -26,7 +26,7 @@ $(document).ready(function () {
     var s = url.split('/')
     var lang = s[0]
     var module = stripExt(s[1])
-    var parseLineNo = s[1].match(/:(\d + )(-(\d + ))?$/)
+    var parseLineNo = s[1].match(/:(\d+)(-(\d+))?$/)
 
     if (app.state.current.equals(lang, module)) {
       if (parseLineNo) {
@@ -34,7 +34,7 @@ $(document).ready(function () {
       }
       // else there's nothing to do!
     } else {
-      if (parseLineNo !== undefined) {
+      if (parseLineNo !== null) {
         app.loadFile(lang, module, parseInt(parseLineNo[1]))
       } else {
         app.loadFile(lang, module)
@@ -53,7 +53,6 @@ function App () {
     lookup: {},
     loadCount: 0,
     recentCount: 5,
-    language: undefined, // lang of drop-down
     current: { // current file
       language: undefined,
       module: undefined,
@@ -132,11 +131,8 @@ function App () {
     $('#scope #results').empty()
     t.updateScopeCount()
     if (msg) {
-      $('#scope #results').html('<em>' + msg + '</em>')
+      $('#scope #results').html('<tr><td colspan="5" class="text-center">' + msg + '</td></tr>')
     }
-  }
-  this.setScope = function (code) {
-    $('#scope #results').html(code)
   }
   this.clearCode = function (msg) {
     $('#code pre').empty()
@@ -153,12 +149,6 @@ function App () {
   }
   this.updateAPICount = function () {
     $('#api #count').text($('#api #results tr:visible').length)
-  }
-
-  this.setLanguage = function (lang) {
-    t.state.language = lang
-    $('#languages select').val(lang)
-    t.initModules(lang)
   }
 
   // hash should be '#code'
@@ -217,18 +207,47 @@ function App () {
       }
 
       // Initialize the language list
-      var langSelect = $('<select>')
-        .attr('id', 'language_select')
-        .change(function () {
-          t.setLanguage($(this).val())
-        })
-        .appendTo('#languages')
+      var menu = $('#module-menu')
       for (lang in data['languages']) {
-        $('<option>')
-          .html(lang)
-          .appendTo(langSelect)
+        $('<a>')
+          .attr('href', '#')
+          .attr('data-target', lang)
+          .attr('data-status', 'closed')
+          .addClass('list-group-item list-group-item-action directory')
+          .append(
+            '<i class="fas fa-folder"></i> ',
+            lang
+          )
+          .appendTo(menu)
+        for (module of data['languages'][lang]) {
+          $('<a>')
+            .attr('href', '#' + lang + '/' + module + '.gf')
+            .attr('data-language', lang)
+            .addClass('list-group-item list-group-item-action module')
+            .text(module)
+            .appendTo(menu)
+            .hide()
+        }
       }
-      t.setLanguage('english')
+      menu.find('a.directory').click(function () {
+        var elem = $(this)
+        var icon = elem.find('i.fas')
+        if (elem.attr('data-status') === 'open') {
+          elem.attr('data-status', 'closed')
+          icon.removeClass('fa-folder-open').addClass('fa-folder')
+          menu.find('[data-language=' + elem.attr('data-target') + ']').hide()
+        } else {
+          elem.attr('data-status', 'open')
+          icon.removeClass('fa-folder').addClass('fa-folder-open')
+          menu.find('[data-language=' + elem.attr('data-target') + ']').show()
+        }
+        return false
+      })
+      menu.find('a.module').click(function () {
+        menu.find('.active').removeClass('active')
+        $(this).addClass('active')
+        // don't return false! continue with linking
+      })
 
       // Module search box
       $('<input>')
@@ -261,18 +280,6 @@ function App () {
   })
 
   // ===== Loading functionality =====
-
-  // Initialize the module list
-  this.initModules = function (lang) {
-    t.state.index['languages'][lang] = t.state.index['languages'][lang].sort()
-    $('#modules').empty()
-    for (var module of t.state.index['languages'][lang]) {
-      $('<a>')
-        .html(module)
-        .attr('href', '#' + lang + '/' + module + '.gf')
-        .appendTo('#modules')
-    }
-  }
 
   // Load both scope & source for a file
   this.loadFile = function (lang, module, lineNo) {
@@ -311,37 +318,37 @@ function App () {
       type: 'GET',
       dataType: 'text',
       success: function (data) {
-        data = data.replace(/^(\S + )\s(\S + )\s(. + )?$/gm, function (a, b, c, d) {
-          var s = d.split('\t')
-          var className, url, name, c1, c2, c3
-          if (c === 'indir') {
-            var module = s[2].substring(s[2].lastIndexOf('/') + 1, s[2].lastIndexOf('.'))
-            var lang = t.lookupModuleLanguage(module)
-            name = lang + '/' + module
-            url = '#' + lang + '/' + module
+        // var tbody = $('#scope table tbody')
+        var tbody = $('#scope #results')
+        // data.replace(/^(\S+)\s(\S+)\s(.+)?$/gm, function (a, b, c, d) {
+        data.split('\n').forEach(function (line) {
+          if (!line) return
+          var s = line.split('\t')
+          var className, ident, jtype, modloc, ftype
+          ident = s[0]
+          if (s[1] === 'indir') {
             className = 'indir'
-            c1 = s[0]
-            c2 = s[1]
-            c3 = ''
+            var module = s[4].substring(s[4].lastIndexOf('/') + 1, s[4].lastIndexOf('.'))
+            var lang = t.lookupModuleLanguage(module)
+            modloc = lang + '/' + module
+            jtype = '<span class="text-muted">(indir)</span>'
+            if (s[2]) jtype += ' ' + s[2]
+            if (s[3]) jtype += '/' + s[3]
           } else {
-            var bits = s[0].split('/') // ['lib', 'src', 'english', 'AdjectiveEng.gf:43-46']
-            name = bits[3] + '/' + bits[4]
-            url = '#' + bits[3] + '/' + bits[4]
-            c1 = ''
-            c2 = ''
-            c3 = s[1]
             className = 'local'
+            jtype = s[1]
+            var bits = s[2].split('/') // [..., ..., 'english', 'AdjectiveEng.gf:43-46']
+            modloc = bits[bits.length - 2] + '/' + bits[bits.length - 1]
+            ftype = s[3]
           }
-          return $('<tr>').addClass(className).attr('data-name', b).append(
-            $('<th>').text(b),
-            $('<td>').text(c),
-            $('<td>').text(c1),
-            $('<td>').text(c2),
-            $('<td>').append($('<a>').attr('href', url).text(name)),
-            $('<td>').text(c3)
-          ).html()
+          var url = '#' + modloc
+          $('<tr>').addClass(className).attr('data-name', ident).append(
+            $('<th>').append($('<code>').text(ident)),
+            $('<td>').html(jtype),
+            $('<td>').append($('<a>').attr('href', url).text(modloc)),
+            $('<td>').text(ftype)
+          ).appendTo(tbody)
         })
-        t.setScope(data)
         t.runFilter()
         t.hideLoading()
       },
@@ -417,21 +424,24 @@ function App () {
         type: 'GET',
         dataType: 'text',
         success: function (data) {
-          var tbody = $('#api table tbody')
-          data.replace(/^(\S+)\s(\S+)\s(.+)?$/gm, function (a, b, c, d) {
-            var s = d.split('\t')
-            if (c !== 'indir') {
-              var type = s[1]
-              if (type) {
-                var bits = s[0].split('/') // ['lib', 'src', 'english', 'AdjectiveEng.gf:43-46']
-                var name = bits[3] + '/' + bits[4]
-                var url = '#' + bits[3] + '/' + bits[4]
-                $('<tr>').attr('data-name', b).append(
-                  $('<th>').append($('<code>').text(b)),
-                  $('<td>').text(c),
-                  $('<td>').append($('<a>').attr('href', url).text(name)),
-                  $('<td>').text(''),
-                  $('<td>').text(s[1])
+          // var tbody = $('#api table tbody')
+          var tbody = $('#api #results')
+          data.split('\n').forEach(function (line) {
+            if (!line) return
+            var s = line.split('\t')
+            if (s[1] !== 'indir') {
+              var ident = s[0]
+              var jtype = s[1]
+              if (jtype) {
+                var bits = s[2].split('/') // [..., ..., 'english', 'AdjectiveEng.gf:43-46']
+                var modloc = bits[bits.length - 2] + '/' + bits[bits.length - 1]
+                var url = '#' + modloc
+                var ftype = s[3]
+                $('<tr>').attr('data-name', ident).append(
+                  $('<th>').append($('<code>').text(ident)),
+                  $('<td>').text(jtype),
+                  $('<td>').append($('<a>').attr('href', url).text(modloc)),
+                  $('<td>').text(ftype)
                 ).appendTo(tbody)
               }
             }
