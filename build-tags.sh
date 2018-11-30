@@ -45,6 +45,8 @@ fi
 echo "Building tags..."
 rm -f "$index"
 printf "{\n  \"urlprefix\": \"/\",\n" >> "$index"
+gitsha=$(cd $basedir ; git rev-parse --verify HEAD --short=7)
+printf "  \"commit\": \"%s\",\n" "$gitsha" >> "$index"
 printf "  \"languages\": {\n" >> "$index"
 y=0
 for fulldir in "$basedir"/*
