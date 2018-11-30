@@ -11,11 +11,20 @@ index="${datadir}/index.json"
 ignore="demo old-demo tmp"
 start=$(date +%s)
 
-# Commands on GNU linux
-# STAT="stat --format=%Y"
+# Set stat command based on OS
 
-# Commands on OSX
-STAT="stat -f %a"
+case "$OS" in
+    "bsd" | "mac")
+        STAT="stat -f %a"
+        ;;
+    "gnu" | "linux")
+        STAT="stat --format=%Y"
+        ;;
+    *)
+        echo "You must speficy the OS variable to be one of: bsd, mac, gnu, linux"
+        exit 1
+        ;;
+esac
 
 # Function for testing array membership
 in_ignore() {
@@ -30,8 +39,7 @@ in_ignore() {
 
 # Check path to RGL
 if [ -z "$GF_RGL" ] ; then
-    echo "You must specify the absolute path to the RGL repository, with GF_RGL e.g.:"
-    echo "GF_RGL=/Users/john/repositories/gf-rgl"
+    echo "You must specify the absolute path to the RGL repository with GF_RGL"
     exit 1
 fi
 basedir="${GF_RGL%/}/src"

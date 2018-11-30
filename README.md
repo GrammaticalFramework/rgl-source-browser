@@ -17,10 +17,12 @@ General steps:
 $ clone https://github.com/GrammaticalFramework/rgl-source-browser.git
 $ sudo ln -s $(pwd)/rgl-source-browser /Library/WebServer/Documents/
 ```
-2. Build the tags (this should be done whenever your grammars are updated):
+2. Build the tags (this should be done whenever your grammars are updated).
+You need to spefic the `OS` and `GF_RGL` variables, e.g.:
 ```
-GF_RGL=/Users/john/repositories/gf-rgl ./build-tags.sh
+OS=mac GF_RGL=/Users/john/repositories/gf-rgl ./build-tags.sh
 ```
+Valid values of `OS` are `bsd`, `mac`, `gnu`, `linux`.
 3. Open the app in a browser, e.g.:
 ```
 open http://localhost/rgl-source-browser
