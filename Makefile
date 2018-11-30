@@ -2,4 +2,4 @@ all:
 	./build-tags.sh
 
 clean:
-	rm -rf tags/*
+	rm -rf data/*

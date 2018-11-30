@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 # Script for building tags files for all RGL
+# Path to RGL repository must be provided via GF_RGL
 # John J. Camilleri, 2018
 
-basedir="/Users/john/repositories/gf-rgl/src"
-tagsdir="tags"
-index="tags/index.json"
+tagsdir="data"
+index="${tagsdir}/index.json"
 ignore="demo old-demo tmp"
 start=$(date +%s)
 
@@ -25,6 +25,18 @@ in_ignore() {
     done
     return 1
 }
+
+# Check path to RGL
+if [ -z "$GF_RGL" ] ; then
+    echo "You must specify the path to the RGL repository, with GF_RGL e.g.:"
+    echo "GF_RGL=/Users/john/repositories/gf-rgl"
+    exit 1
+fi
+basedir="${GF_RGL%/}/src"
+if [ ! -d "$basedir" ] ; then
+    echo "Cannot find directory ${basedir}"
+    exit 1
+fi
 
 # Make the dir just to be sure
 [ -d "$tagsdir" ] || mkdir "$tagsdir"
