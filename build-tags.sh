@@ -28,7 +28,7 @@ in_ignore() {
 
 # Check path to RGL
 if [ -z "$GF_RGL" ] ; then
-    echo "You must specify the path to the RGL repository, with GF_RGL e.g.:"
+    echo "You must specify the absolute path to the RGL repository, with GF_RGL e.g.:"
     echo "GF_RGL=/Users/john/repositories/gf-rgl"
     exit 1
 fi
@@ -78,3 +78,6 @@ printf "\n  }\n}\n" >> "$index"
 # Replace all paths
 echo "Replacing paths..."
 sed -i '' "s!${basedir}/!!;s!${tagsdir}/!!;" "$tagsdir"/*.gf-tags
+
+# TODO: renaming of
+# AdN	indir	CatAra		Z:\Users\john\repositories\gf-rgl\src\common\CommonX.gf-tags

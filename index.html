@@ -46,13 +46,19 @@
               <div class="text-muted" style="padding: .5rem 1rem">Module: <span>...</span></div>
             </li> -->
             <li class="nav-item">
-              <a class="nav-link active" id="tab-scope" data-toggle="tab" href="#cont-scope" role="tab" aria-controls="scope" aria-selected="true">Scope</a>
+              <a class="nav-link active" id="tab-scope" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="true">Scope</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="tab-code" data-toggle="tab" href="#cont-code" role="tab" aria-controls="code" aria-selected="false">Code</a>
+              <a class="nav-link" id="tab-code" data-toggle="tab" href="#code" role="tab" aria-controls="code" aria-selected="false">Code</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="tab-api" data-toggle="tab" href="#api" role="tab" aria-controls="api" aria-selected="false">API</a>
             </li>
             <li class="nav-item" id="loading">
               <i class="fas fa-circle-notch fa-spin text-danger m-2" style="font-size:1.5em"></i>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
             </li>
             <li class="nav-item ml-auto">
               <div class="text-muted small text-right py-0">
@@ -65,7 +71,7 @@
             </li>
           </ul>
           <div class="tab-content" style="overflow:scroll">
-            <div class="tab-pane show active py-2" id="cont-scope" role="tabpanel" aria-labelledby="tab-scope">
+            <div class="tab-pane show active py-2" id="scope" role="tabpanel" aria-labelledby="tab-scope">
               <form class="form-inline mb-2">
                 <div class="input-group mr-2 w-25">
                   <div class="input-group-prepend">
@@ -92,7 +98,7 @@
                   </label>
                 </div>
               </form>
-              <table class="table table-sm table-striped">
+              <table class="table table-striped">
                 <thead>
                   <tr>
                     <th scope="col">Identifier</th>
@@ -103,131 +109,13 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@fat</td>
-                  </tr>
                 </tbody>
               </table>
             </div>
-            <div class="tab-pane py-2" id="cont-code" role="tabpanel" aria-labelledby="tab-code">
-<pre><code class="haskell">
--- (c) 2013 John J. Camilleri under LGPL
-
-concrete FoodsMlt of Foods = open Prelude in {
-  flags coding=utf8 ;
-
-  lincat
-    Comment = SS ;
-    Quality = {s : Gender => Number => Str} ;
-    Kind = {s : Number => Str ; g : Gender} ;
-    Item = {s : Str ; g : Gender ; n : Number} ;
-
-  lin
-    -- Pred item quality = ss (item.s ++ copula item.n item.g ++ quality.s ! item.g ! item.n) ;
-    Pred item quality = ss (item.s ++ quality.s ! item.g ! item.n) ;
-
-    This kind = det Sg "dan" "din" kind ;
-    That kind = det Sg "dak" "dik" kind ;
-    These kind = det Pl "dawn" "" kind ;
-    Those kind = det Pl "dawk" "" kind ;
-
-    Mod quality kind = {
-      s = \\n => kind.s ! n ++ quality.s ! kind.g ! n ;
-      g = kind.g
-      } ;
-
-    Wine = noun "inbid" "inbejjed" Masc ;
-    Cheese = noun "ġobon" "ġobniet" Masc ;
-    Fish = noun "ħuta" "ħut" Fem ;
-    Pizza = noun "pizza" "pizzez" Fem ;
-
-    Very qual = {s = \\g,n => qual.s ! g ! n ++ "ħafna"} ;
-
-    Warm = adjective "sħun" "sħuna" "sħan" ;
-    Expensive = adjective "għali" "għalja" "għaljin" ;
-    Delicious = adjective "tajjeb" "tajba" "tajbin" ;
-    Boring = uniAdj "tad-dwejjaq" ;
-    Fresh = regAdj "frisk" ;
-    Italian = regAdj "Taljan" ;
-
-  param
-    Number = Sg | Pl ;
-    Gender = Masc | Fem ;
-
-  oper
-    --Create an adjective (full function)
-    --Params: Sing Masc, Sing Fem, Plural
-    adjective : (_,_,_ : Str) -> {s : Gender => Number => Str} = \iswed,sewda,suwed -> {
-      s = table {
-	Masc => table {
-	  Sg => iswed ;
-	  Pl => suwed
-	  } ;
-	Fem => table {
-	  Sg => sewda ;
-	  Pl => suwed
-	  }
-	}
-      } ;
-
-    --Create a regular adjective
-    --Param: Sing Masc
-    regAdj : Str -> {s : Gender => Number => Str} = \frisk ->
-      adjective frisk (frisk + "a") (frisk + "i") ;
-
-    --Create a "uni-adjective" eg tal-buzz
-    --Param: Sing Masc
-    uniAdj : Str -> {s : Gender => Number => Str} = \uni ->
-      adjective uni uni uni ;
-
-    --Create a noun
-    --Params: Singular, Plural, Gender (inherent)
-    noun : Str -> Str -> Gender -> {s : Number => Str ; g : Gender} = \ktieb,kotba,g -> {
-      s = table {
-	Sg => ktieb ;
-	Pl => kotba
-	} ;
-      g = g
-      } ;
-
-    --Copula is a linking verb
-    --Params: Number, Gender
-    -- copula : Number -> Gender -> Str = \n,g -> case n of {
-    --   Sg => case g of { Masc => "huwa" ; Fem => "hija" } ;
-    --   Pl => "huma"
-    --   } ;
-
-    --Create an article, taking into account first letter of next word
-    article = pre {
-      "a"|"e"|"i"|"o"|"u" => "l-" ;
-      --cons@("ċ"|"d"|"n"|"r"|"s"|"t"|"x"|"ż") => "i" + cons + "-" ;
-      _ => "il-"
-      } ;
-
-    --Create a determinant
-    --Params: Sg/Pl, Masc, Fem
-    det : Number -> Str -> Str -> {s : Number => Str ; g : Gender} -> {s : Str ; g : Gender ; n : Number} = \n,m,f,cn -> {
-      s = case n of {
-	Sg => case cn.g of {Masc => m ; Fem => f}; --string
-	Pl => m --default to masc
-	} ++ article ++ cn.s ! n ;
-      g = cn.g ; --gender
-      n = n --number
-      } ;
-
-}
-</code></pre>
+            <div class="tab-pane py-2" id="code" role="tabpanel" aria-labelledby="tab-code">
+              <pre><code class="haskell"></code></pre>
+            </div>
+            <div class="tab-pane py-2" id="api" role="tabpanel" aria-labelledby="tab-api">
             </div>
           </div>
 
@@ -242,6 +130,7 @@ concrete FoodsMlt of Foods = open Prelude in {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/haskell.min.js" integrity="sha256-WxYLWg8NFyyEq+Zs9pVsDQmlFpJt+733DecPx5+hrQw=" crossorigin="anonymous"></script>
     <script>hljs.initHighlightingOnLoad();</script>
+    <script src="jquery.history.min.js"></script>
     <script src="browser.js"></script>
   </body>
 </html>
