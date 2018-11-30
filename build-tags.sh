@@ -4,8 +4,10 @@
 # Path to RGL repository must be provided via GF_RGL
 # John J. Camilleri, 2018
 
-tagsdir="data"
-index="${tagsdir}/index.json"
+datadir="data"
+tagsdir="${datadir}/tags"
+srcdir="${datadir}/src"
+index="${datadir}/index.json"
 ignore="demo old-demo tmp"
 start=$(date +%s)
 
@@ -38,13 +40,18 @@ if [ ! -d "$basedir" ] ; then
     exit 1
 fi
 
-# Make the dir just to be sure
-[ -d "$tagsdir" ] || mkdir "$tagsdir"
+# Make the dirs just to be sure
+mkdir -p "$datadir"
+mkdir -p "$tagsdir"
+mkdir -p "$srcdir"
 
 # Iterate and build all the tags (takes some time)
 echo "Building tags..."
 rm -f "$index"
-printf "{\n  \"urlprefix\": \"/\",\n" >> "$index"
+printf "{\n" >> "$index"
+# printf "  \"urlprefix\": \"/\",\n" >> "$index"
+printf "  \"tags_path\": \"${tagsdir}\",\n" >> "$index"
+printf "  \"src_path\": \"${srcdir}\",\n" >> "$index"
 gitsha=$(cd $basedir ; git rev-parse --verify HEAD --short=7)
 printf "  \"commit\": \"%s\",\n" "$gitsha" >> "$index"
 printf "  \"languages\": {\n" >> "$index"
@@ -53,7 +60,9 @@ for fulldir in "$basedir"/*
 do
     dir=$(basename "$fulldir")
     if ! in_ignore "$dir" && [ -d "$fulldir" ] ; then
-        echo "$fulldir"
+        echo "$dir"
+        mkdir -p "${srcdir}/${dir}"
+        cp -r "$fulldir"/*.gf "${srcdir}/${dir}/"
         if ((y > 0)); then printf ",\n" >> "$index" ; fi
         printf "    \"%s\": [\n" "$dir" >> "$index"
         x=0
@@ -63,8 +72,7 @@ do
             if ((x > 0)); then printf ",\n" >> "$index" ; fi
             printf "      \"%s\"" "$(echo "$file" | sed 's|./||;s|.gf||')" >> "$index"
             filemtime=$($STAT "${tagsdir}/${file}-tags" 2>/dev/null)
-            if [ -z "$filemtime" ] || [ "$filemtime" -lt "$start" ]
-            then
+            if [ -z "$filemtime" ] || [ "$filemtime" -lt "$start" ] ; then
                 gf --batch --quiet --tags --output-dir="$tagsdir" "$fullfile" 2>/dev/null
             fi
             ((x+=1))

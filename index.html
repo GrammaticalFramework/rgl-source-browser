@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" integrity="sha256-3YM6A3pH4QFCl9WbSU8oXF5N6W/2ylvW0o2g+Z6TmLQ=" crossorigin="anonymous" />
     <link rel="stylesheet" href="browser.css">
     <title>RGL Browser</title>
+    <link rel="icon" href="data:,">
   </head>
   <body class="h-100">
     <div class="container-fluid">
@@ -30,7 +31,7 @@
               <input type="text" class="form-control" placeholder="Module" aria-label="Module">
             </div>
           </form>
-          <nav class="list-group" id="module-menu"></nav>
+          <nav class="list-group" id="menu"></nav>
         </div>
         <div class="col-10 pt-3" id="col-main">
 
@@ -45,7 +46,7 @@
               <a class="nav-link" id="tab-code" data-toggle="tab" href="#code" role="tab" aria-controls="code" aria-selected="false">Code</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="tab-api" data-toggle="tab" href="#api" role="tab" aria-controls="api" aria-selected="false">API</a>
+              <a class="nav-link text-muted" id="tab-api" data-toggle="tab" href="#api" role="tab" aria-controls="api" aria-selected="false">API</a>
             </li>
             <li class="nav-item">
               <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
@@ -121,7 +122,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/haskell.min.js" integrity="sha256-WxYLWg8NFyyEq+Zs9pVsDQmlFpJt+733DecPx5+hrQw=" crossorigin="anonymous"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
     <script src="jquery.history.min.js"></script>
     <script src="browser.js"></script>
   </body>

@@ -1,4 +1,4 @@
-/* global $ prettyPrint alert */
+/* global $ hljs alert */
 
 // Adjust heights
 $(window).on('resize', function () {
@@ -9,41 +9,41 @@ $(window).on('resize', function () {
 $(window).trigger('resize')
 
 // Path to data
-var DATA_PATH = 'data/'
+var INDEX_PATH = 'data/index.json'
 
 // Main app
 var app
 $(document).ready(function () {
-  app = new App()
-
-  // ===== URL history =====
-  $.history.on('load change push pushed', function (event, url, type) {
-    var stripExt = function (s) {
-      var i = s.lastIndexOf('.')
-      return (i > -1) ? s.substr(0, i) : s
-    }
-
-    var s = url.split('/')
-    var lang = s[0]
-    var module = stripExt(s[1])
-    var parseLineNo = s[1].match(/:(\d+)(-(\d+))?$/)
-
-    if (app.state.current.equals(lang, module)) {
-      if (parseLineNo) {
-        app.scrollToCodeLine(parseInt(parseLineNo[1]))
+  app = new App(function () {
+    // ===== URL history =====
+    $.history.on('load change push pushed', function (event, url, type) {
+      var stripExt = function (s) {
+        var i = s.lastIndexOf('.')
+        return (i > -1) ? s.substr(0, i) : s
       }
-      // else there's nothing to do!
-    } else {
-      if (parseLineNo !== null) {
-        app.loadFile(lang, module, parseInt(parseLineNo[1]))
+
+      var s = url.split('/')
+      var lang = s[0]
+      var module = stripExt(s[1])
+      var parseLineNo = s[1].match(/:(\d+)(-(\d+))?$/)
+
+      if (app.state.current.equals(lang, module)) {
+        if (parseLineNo) {
+          app.scrollToCodeLine(parseInt(parseLineNo[1]))
+        }
+        // else there's nothing to do!
       } else {
-        app.loadFile(lang, module)
+        if (parseLineNo !== null) {
+          app.loadFile(lang, module, parseInt(parseLineNo[1]))
+        } else {
+          app.loadFile(lang, module)
+        }
       }
-    }
-  }).listen('hash')
+    }).listen('hash')
+  })
 })
 
-function App () {
+function App (oninit) {
   var t = this
 
   // ===== State information =====
@@ -68,8 +68,7 @@ function App () {
         }
       }
     },
-    title: 'RGL Source Browser',
-    urlPrefix: '/',
+    title: $('title').text(),
     defaultLangs: ['abstract', 'api', 'common', 'prelude']
   }
 
@@ -135,14 +134,14 @@ function App () {
     }
   }
   this.clearCode = function (msg) {
-    $('#code pre').empty()
+    $('#code pre code').empty()
     if (msg) {
-      $('#codes pre').html('<em>' + msg + '</em>')
+      $('#code pre code').html('<em>' + msg + '</em>')
     }
   }
   this.setCode = function (code) {
-    $('#code pre').text(code)
-    prettyPrint()
+    var elem = $('#code pre code').text(code)
+    hljs.highlightBlock(elem[0])
   }
   this.updateScopeCount = function () {
     $('#scope #count').text($('#scope #results tr:visible').length)
@@ -184,12 +183,11 @@ function App () {
 
   // Load the index file and populate language & module lists
   $.ajax({
-    url: DATA_PATH + 'index.json',
+    url: INDEX_PATH,
     dataType: 'json',
     type: 'GET',
     success: function (data) {
       t.state.index = data
-      if (data['urlprefix']) t.state.urlPrefix = data['urlprefix']
 
       // RGL commit
       if (data['commit']) {
@@ -207,11 +205,11 @@ function App () {
       }
 
       // Initialize the language list
-      var menu = $('#module-menu')
+      var menu = $('#menu')
       for (lang in data['languages']) {
         $('<a>')
           .attr('href', '#')
-          .attr('data-target', lang)
+          .attr('data-language', lang)
           .attr('data-status', 'closed')
           .addClass('list-group-item list-group-item-action directory')
           .append(
@@ -223,6 +221,7 @@ function App () {
           $('<a>')
             .attr('href', '#' + lang + '/' + module + '.gf')
             .attr('data-language', lang)
+            .attr('data-module', module)
             .addClass('list-group-item list-group-item-action module')
             .text(module)
             .appendTo(menu)
@@ -235,18 +234,13 @@ function App () {
         if (elem.attr('data-status') === 'open') {
           elem.attr('data-status', 'closed')
           icon.removeClass('fa-folder-open').addClass('fa-folder')
-          menu.find('[data-language=' + elem.attr('data-target') + ']').hide()
+          menu.find('.module[data-language=' + elem.attr('data-language') + ']').hide()
         } else {
           elem.attr('data-status', 'open')
           icon.removeClass('fa-folder').addClass('fa-folder-open')
-          menu.find('[data-language=' + elem.attr('data-target') + ']').show()
+          menu.find('.module[data-language=' + elem.attr('data-language') + ']').show()
         }
         return false
-      })
-      menu.find('a.module').click(function () {
-        menu.find('.active').removeClass('active')
-        $(this).addClass('active')
-        // don't return false! continue with linking
       })
 
       // Module search box
@@ -270,6 +264,9 @@ function App () {
       // Initialize API results
       t.initAPI()
 
+      // Run post-init hook
+      if (typeof oninit === 'function') oninit()
+
       // Done
       t.hideLoading()
     },
@@ -284,12 +281,17 @@ function App () {
   // Load both scope & source for a file
   this.loadFile = function (lang, module, lineNo) {
     t.setTitle(lang + '/' + module)
+    $('#menu a.module.active').removeClass('active')
+    $('#menu a.module[data-language=' + lang + '][data-module=' + module + ']').addClass('active')
+    var dir = $('#menu a.directory[data-language=' + lang + ']')
+    if (dir.attr('data-status') !== 'open') dir.trigger('click')
     t.state.current.set(lang, module)
     t.loadTagsFile(module)
     t.loadSourceFile(lang, module, lineNo)
-    if ($('.tab.api').hasClass('active')) {
-      t.showPanel('#scope')
-    }
+    // TODO
+    // if ($('.tab.api').hasClass('active')) {
+    //   t.showPanel('#scope')
+    // }
     t.addRecent(lang, module)
   }
 
@@ -314,7 +316,7 @@ function App () {
     t.clearScope()
     t.showLoading()
     $.ajax({
-      url: DATA_PATH + module + '.gf-tags',
+      url: t.state.index.tags_path + '/' + module + '.gf-tags',
       type: 'GET',
       dataType: 'text',
       success: function (data) {
@@ -364,7 +366,7 @@ function App () {
     t.clearCode()
     t.showLoading()
     $.ajax({
-      url: t.state.urlPrefix + 'lib/src/' + lang + '/' + module + '.gf',
+      url: t.state.index.src_path + '/' + lang + '/' + module + '.gf',
       type: 'GET',
       dataType: 'text',
       success: function (data, status, xhr) {
@@ -420,7 +422,7 @@ function App () {
     for (var i in t.apiModules) {
       var module = t.apiModules[i]
       $.ajax({
-        url: DATA_PATH + module + '.gf-tags',
+        url: t.state.index.tags_path + '/' + module + '.gf-tags',
         type: 'GET',
         dataType: 'text',
         success: function (data) {
