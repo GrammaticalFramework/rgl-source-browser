@@ -35,3 +35,21 @@
 .table td, .table th {
   padding: .5rem;
 }
+
+
+/* code highlighting */
+.hljs {
+  background-color: white;
+}
+table.hljs-ln {
+  width: 100%;
+}
+.hljs-ln td.hljs-ln-numbers {
+  text-align: right;
+  color: #ccc;
+  padding-right: 1rem;
+}
+
+/* for block of code */
+/* .hljs-ln td.hljs-ln-code {
+} */
