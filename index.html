@@ -28,7 +28,7 @@
                   <i class="fas fa-search"></i>
                 </span>
               </div>
-              <input type="text" class="form-control" placeholder="Module search" aria-label="Module search" id="module-search">
+              <input type="text" class="form-control" placeholder="Module search" aria-label="Module search" id="input-module-search">
             </div>
           </form>
           <nav class="list-group" id="menu"></nav>
@@ -36,9 +36,9 @@
         <div class="col-10 pt-3" id="col-main">
 
           <ul class="nav nav-tabs" role="tablist">
-            <!-- <li class="nav-item mr-5">
-              <div class="text-muted" style="padding: .5rem 1rem">Module: <span>...</span></div>
-            </li> -->
+            <li class="nav-item mt-2 mr-3">
+              <div class="text-muted"><span id="current-module"></span></div>
+            </li>
             <li class="nav-item">
               <a class="nav-link active" id="tab-scope" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="true">Scope</a>
             </li>
@@ -51,8 +51,8 @@
             <li class="nav-item">
               <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
             </li>
-            <li class="nav-item" id="loading">
-              <i class="fas fa-circle-notch fa-spin text-danger mt-2" style="font-size:1.5em"></i>
+            <li class="nav-item mt-2" id="loading">
+              <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
             </li>
             <li class="nav-item ml-auto">
               <div class="text-muted small text-right py-0">
@@ -66,21 +66,21 @@
           </ul>
           <div class="tab-content" style="overflow:scroll">
             <div class="tab-pane show active py-2" id="scope" role="tabpanel" aria-labelledby="tab-scope">
-              <form class="form-inline mb-2">
+              <div class="form-inline mb-2">
                 <div class="input-group mr-2 w-25">
                   <div class="input-group-prepend">
                     <span class="input-group-text">
                       <i class="fas fa-filter"></i>
                     </span>
                   </div>
-                  <input type="text" class="form-control" placeholder="Filter" aria-label="Module">
+                  <input type="text" class="form-control" placeholder="Filter" aria-label="Module" id="input-filter">
                 </div>
+                <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
                 <div class="mx-2">
                   <span id="count">&hellip;</span> items
                 </div>
-                <button type="button" class="btn btn-secondary mx-2">Clear</button>
                 <div class="form-check mx-2">
-                  <input class="form-check-input" type="radio" name="show-what" id="input-show-all">
+                  <input class="form-check-input" type="radio" name="show-what" id="input-show-all" checked>
                   <label class="form-check-label" for="input-show-all">
                     Show all
                   </label>
@@ -91,8 +91,14 @@
                     Local only
                   </label>
                 </div>
-              </form>
-              <table class="table table-striped">
+                <div class="form-check mx-2">
+                  <input class="form-check-input" type="checkbox" name="case-sensitive" id="input-case-sensitive">
+                  <label class="form-check-label" for="input-case-sensitive">
+                    Case sensitive
+                  </label>
+                </div>
+              </div>
+              <table class="table">
                 <thead>
                   <tr>
                     <th scope="col">Identifier</th>

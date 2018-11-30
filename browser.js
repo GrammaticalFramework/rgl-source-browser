@@ -158,11 +158,16 @@ function App (oninit) {
   }
 
   this.setTitle = function (s) {
-    $('#module_name').html(s)
+    $('#current-module').text(s)
     $('title').html(t.state.title + ': ' + s)
   }
 
   // ===== Initialization =====
+
+  // Copy HTML from Scope tab to API
+  $('#api').html($('#scope').html())
+  $('#api #input-show-all').parent().remove()
+  $('#api #input-show-local').parent().remove()
 
   // Load the index file and populate language & module lists
   $.ajax({
@@ -222,11 +227,6 @@ function App (oninit) {
         }
         return false
       })
-
-      // Module search box
-      $('#module-search').keyup(delay(function () {
-        t.searchModule($(this).val())
-      }, 500))
 
       // TODO
       // Recent modules
@@ -401,8 +401,6 @@ function App (oninit) {
   ]
   this.initAPI = function () {
     t.showLoading()
-    // Copy HTML from Scope tab
-    $('#api').html($('#scope').html())
     for (var i in t.apiModules) {
       var module = t.apiModules[i]
       $.ajax({
@@ -444,6 +442,11 @@ function App (oninit) {
 
   // ===== Module search =====
 
+  // Module search box
+  $('#input-module-search').keyup(delay(function () {
+    t.searchModule($(this).val())
+  }, 500))
+
   this.searchModule = function (s) {
     if (!s) {
       return t.clearSearchModule()
@@ -474,17 +477,15 @@ function App (oninit) {
 
   // ===== Filtering of scope info =====
 
-  // TODO
-
   // Custom selector
   $.expr[':'].match = function (a, b, c) {
     var obj = $(a)
     var needle = c[3]
     var haystack = obj.attr('data-name')
-    if (haystack === undefined) {
+    if (!haystack) {
       return false
     }
-    if ($('#scope #case_sensitive').is(':checked')) {
+    if ($('#scope #input-case-sensitive').is(':checked')) {
       return haystack.indexOf(needle) >= 0
     } else {
       return haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0
@@ -493,8 +494,7 @@ function App (oninit) {
 
   this.runFilter = function () {
     t.showLoading()
-    $('#scope #results tr').removeClass('odd')
-    var s = $('#scope #search').val()
+    var s = $('#scope #input-filter').val()
     try {
       if (s) {
         $('#scope #results tr').hide()
@@ -502,46 +502,43 @@ function App (oninit) {
       } else {
         $('#scope #results tr').show()
       }
-      if ($('#scope #show_local').is(':checked')) {
+      if ($('#scope #input-show-local').is(':checked')) {
         $('#scope #results tr.indir').hide()
       }
     } catch (error) {
       alert(error.message)
     }
     t.updateScopeCount()
-    $('#scope #results tr:visible:odd').addClass('odd')
     t.hideLoading()
   }
 
   // Instant results
-  this.prevSearch = $('#scope #search').val()
-  $('#scope #search').keyup(function () {
-    var s = $('#scope #search').val()
+  this.prevSearch = $('#scope #input-filter').val()
+  $('#scope #input-filter').keyup(function () {
+    var s = $(this).val()
     if (s !== t.prevSearch) {
       t.runFilter()
       t.prevSearch = s
     }
   })
 
-  $('#scope #search').keypress(function (e) {
-    var code = (e.keyCode ? e.keyCode : e.which)
-    if (code === 13) { // Enter
-      t.runFilter()
-    }
-  })
-  $('#scope #clear').click(function () {
-    $('#scope #search')
+  // $('#scope #input-filter').keypress(function (e) {
+  //   var code = (e.keyCode ? e.keyCode : e.which)
+  //   if (code === 13) { // Enter
+  //     t.runFilter()
+  //   }
+  // })
+  $('#scope #btn-clear').click(function () {
+    $('#scope #input-filter')
       .val('')
       .focus()
     t.runFilter()
   })
-  $('#scope #case_sensitive').change(t.runFilter)
-  $('#scope #show_all').change(t.runFilter)
-  $('#scope #show_local').change(t.runFilter)
+  $('#scope #input-case-sensitive').change(t.runFilter)
+  $('#scope #input-show-all').change(t.runFilter)
+  $('#scope #input-show-local').change(t.runFilter)
 
   // ===== API filter =====
-
-  // TODO
 
   // Custom selector
   $.expr[':'].matchAPI = function (a, b, c) {
@@ -551,16 +548,16 @@ function App (oninit) {
     var needle = c[3]
     var matchIdent = ident.toLowerCase().indexOf(needle.toLowerCase()) >= 0
     var matchType = type.toLowerCase().indexOf(needle.toLowerCase()) >= 0
-    // if ($('#scope #case_sensitive').is(':checked'))
-    //   return haystack.indexOf(needle)>=0
-    // else
-    return matchIdent || matchType
+    if ($('#api #input-case-sensitive').is(':checked')) {
+      return ident.indexOf(needle) >= 0 || type.indexOf(needle) >= 0
+    } else {
+      return matchIdent || matchType
+    }
   }
 
   this.runFilterAPI = function () {
     t.showLoading()
-    $('#api #results tr').removeClass('odd')
-    var s = $('#api #search').val()
+    var s = $('#api #input-filter').val()
     try {
       if (s) {
         $('#api #results tr').hide()
@@ -572,32 +569,32 @@ function App (oninit) {
       alert(error.message)
     }
     t.updateAPICount()
-    $('#api #results tr:visible:odd').addClass('odd')
     t.hideLoading()
   }
 
   // Instant results
-  this.prevAPISearch = $('#api #search').val()
-  $('#api #search').keyup(function () {
-    var s = $('#api #search').val()
+  this.prevAPISearch = $('#api #input-filter').val()
+  $('#api #input-filter').keyup(function () {
+    var s = $('#api #input-filter').val()
     if (s !== t.prevAPISearch) {
       t.runFilterAPI()
       t.prevAPISearch = s
     }
   })
 
-  $('#api #search').keypress(function (e) {
-    var code = (e.keyCode ? e.keyCode : e.which)
-    if (code === 13) { // Enter
-      t.runFilterAPI()
-    }
-  })
-  $('#api #clear').click(function () {
-    $('#api #search')
+  // $('#api #input-filter').keypress(function (e) {
+  //   var code = (e.keyCode ? e.keyCode : e.which)
+  //   if (code === 13) { // Enter
+  //     t.runFilterAPI()
+  //   }
+  // })
+  $('#api #btn-clear').click(function () {
+    $('#api #input-filter')
       .val('')
       .focus()
     t.runFilterAPI()
   })
+  $('#api #input-case-sensitive').change(t.runFilterAPI)
 }
 
 // ===== Helpers =====
