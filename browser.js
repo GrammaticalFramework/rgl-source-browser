@@ -172,7 +172,7 @@ function App (oninit) {
       // RGL commit
       if (data['commit']) {
         $('#rgl-commit')
-          .append('<i class="mr-1 fas fa-code-branch"></i>', data['commit'])
+          .append('RGL <i class="mr-1 fas fa-code-branch"></i>', data['commit'])
           .attr('href', 'https://github.com/GrammaticalFramework/gf-rgl/tree/' + data['commit'])
       }
 
@@ -358,6 +358,9 @@ function App (oninit) {
   $('#input-module-search').keyup(delay(function () {
     t.searchModule($(this).val())
   }, 500))
+  $('form').submit(function (e) {
+    e.preventDefault()
+  })
 
   this.searchModule = function (s) {
     if (!s) {
