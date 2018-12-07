@@ -144,9 +144,6 @@ function App (oninit) {
   this.updateScopeCount = function () {
     $('#scope #count').text($('#scope #results tr:visible').length)
   }
-  this.updateAPICount = function () {
-    $('#api #count').text($('#api #results tr:visible').length)
-  }
 
   // hash should be '#code'
   this.showPanel = function (hash, callback) {
@@ -163,11 +160,6 @@ function App (oninit) {
   }
 
   // ===== Initialization =====
-
-  // Copy HTML from Scope tab to API
-  $('#api').html($('#scope').html())
-  $('#api #input-show-all').parent().remove()
-  $('#api #input-show-local').parent().remove()
 
   // Load the index file and populate language & module lists
   $.ajax({
@@ -234,9 +226,6 @@ function App (oninit) {
       //   .attr('id', 'recent')
       //   .appendTo('#languages')
 
-      // Initialize API results
-      t.initAPI()
-
       // Run post-init hook
       if (typeof oninit === 'function') oninit()
 
@@ -272,10 +261,6 @@ function App (oninit) {
     t.state.current.set(lang, module)
     t.loadTagsFile(module)
     t.loadSourceFile(lang, module, lineNo)
-    // TODO
-    // if ($('.tab.api').hasClass('active')) {
-    //   t.showPanel('#scope')
-    // }
     t.addRecent(lang, module)
   }
 
@@ -332,7 +317,7 @@ function App (oninit) {
             $('<th>').append($('<code>').text(ident)),
             $('<td>').html(jtype),
             $('<td>').append($('<a>').attr('href', url).text(modloc)),
-            $('<td>').text(ftype)
+            $('<td>').append($('<code>').text(ftype))
           ).appendTo(tbody)
         })
         t.runFilter()
@@ -365,79 +350,6 @@ function App (oninit) {
         t.hideLoading()
       }
     })
-  }
-
-  // Which modules do we include for API?
-  this.apiModules = [
-    // api
-    'Syntax'
-    // 'Constructors', 'Cat', 'Structural', 'Combinators',
-    // abstract
-    // 'Adjective',
-    // 'Adverb',
-    // 'Backward',
-    // 'Cat',
-    // 'Common',
-    // 'Compatibility',
-    // 'Conjunction',
-    // 'Extra',
-    // 'Grammar',
-    // 'Idiom',
-    // 'Lang',
-    // 'Lexicon',
-    // 'Noun',
-    // 'Numeral',
-    // 'NumeralTransfer',
-    // 'Phrase',
-    // 'Question',
-    // 'Relative',
-    // 'Sentence',
-    // 'Structural',
-    // 'Symbol',
-    // 'Tense',
-    // 'Text',
-    // 'Transfer',
-    // 'Verb',
-  ]
-  this.initAPI = function () {
-    t.showLoading()
-    for (var i in t.apiModules) {
-      var module = t.apiModules[i]
-      $.ajax({
-        url: t.state.index.tags_path + '/' + module + '.gf-tags',
-        type: 'GET',
-        dataType: 'text',
-        success: function (data) {
-          // var tbody = $('#api table tbody')
-          var tbody = $('#api #results')
-          data.split('\n').forEach(function (line) {
-            if (!line) return
-            var s = line.split('\t')
-            if (s[1] !== 'indir') {
-              var ident = s[0]
-              var jtype = s[1]
-              if (jtype) {
-                var bits = s[2].split('/') // [..., ..., 'english', 'AdjectiveEng.gf:43-46']
-                var modloc = bits[bits.length - 2] + '/' + bits[bits.length - 1]
-                var url = '#' + modloc
-                var ftype = s[3]
-                $('<tr>').attr('data-name', ident).append(
-                  $('<th>').append($('<code>').text(ident)),
-                  $('<td>').text(jtype),
-                  $('<td>').append($('<a>').attr('href', url).text(modloc)),
-                  $('<td>').text(ftype)
-                ).appendTo(tbody)
-              }
-            }
-          })
-          $('#api #count').text(tbody.find('tr').length)
-        },
-        error: function (data) {
-          console.log('Error loading tags file: ' + module)
-        }
-      })
-    }
-    t.hideLoading()
   }
 
   // ===== Module search =====
@@ -538,63 +450,10 @@ function App (oninit) {
   $('#scope #input-show-all').change(t.runFilter)
   $('#scope #input-show-local').change(t.runFilter)
 
-  // ===== API filter =====
-
-  // Custom selector
-  $.expr[':'].matchAPI = function (a, b, c) {
-    var obj = $(a) // tr
-    var ident = $(obj.children().get(0)).text()
-    var type = $(obj.children().get(3)).text()
-    var needle = c[3]
-    var matchIdent = ident.toLowerCase().indexOf(needle.toLowerCase()) >= 0
-    var matchType = type.toLowerCase().indexOf(needle.toLowerCase()) >= 0
-    if ($('#api #input-case-sensitive').is(':checked')) {
-      return ident.indexOf(needle) >= 0 || type.indexOf(needle) >= 0
-    } else {
-      return matchIdent || matchType
-    }
-  }
-
-  this.runFilterAPI = function () {
-    t.showLoading()
-    var s = $('#api #input-filter').val()
-    try {
-      if (s) {
-        $('#api #results tr').hide()
-        $('#api #results tr:matchAPI(\'' + s + '\')').show()
-      } else {
-        $('#api #results tr').show()
-      }
-    } catch (error) {
-      alert(error.message)
-    }
-    t.updateAPICount()
-    t.hideLoading()
-  }
-
-  // Instant results
-  this.prevAPISearch = $('#api #input-filter').val()
-  $('#api #input-filter').keyup(function () {
-    var s = $('#api #input-filter').val()
-    if (s !== t.prevAPISearch) {
-      t.runFilterAPI()
-      t.prevAPISearch = s
-    }
+  $('#btn-api').click(function () {
+    $('#input-show-local').prop('checked', true)
+    $.history.push('api/Syntax')
   })
-
-  // $('#api #input-filter').keypress(function (e) {
-  //   var code = (e.keyCode ? e.keyCode : e.which)
-  //   if (code === 13) { // Enter
-  //     t.runFilterAPI()
-  //   }
-  // })
-  $('#api #btn-clear').click(function () {
-    $('#api #input-filter')
-      .val('')
-      .focus()
-    t.runFilterAPI()
-  })
-  $('#api #input-case-sensitive').change(t.runFilterAPI)
 }
 
 // ===== Helpers =====

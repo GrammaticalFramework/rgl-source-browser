@@ -21,7 +21,7 @@
             <div class="navbar-brand align-middle">RGL Browser</div>
           </div>
 
-          <form class="form-inline mb-2">
+          <form class="form-inline">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">
@@ -31,6 +31,10 @@
               <input type="text" class="form-control" placeholder="Module search" aria-label="Module search" id="input-module-search">
             </div>
           </form>
+          <button class="btn btn-secondary w-100 my-1" id="btn-api">
+            <i class="fab fa-readme mr-1"></i>
+            Show API
+          </button>
           <nav class="list-group" id="menu"></nav>
         </div>
         <div class="col-10 pt-3" id="col-main">
@@ -44,9 +48,6 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" id="tab-code" data-toggle="tab" href="#code" role="tab" aria-controls="code" aria-selected="false">Code</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-muted" id="tab-api" data-toggle="tab" href="#api" role="tab" aria-controls="api" aria-selected="false">API</a>
             </li>
             <li class="nav-item">
               <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
@@ -76,8 +77,11 @@
                   <input type="text" class="form-control" placeholder="Filter" aria-label="Module" id="input-filter">
                 </div>
                 <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
-                <div class="mx-2">
-                  <span id="count">&hellip;</span> items
+                <div class="form-check mx-2">
+                  <input class="form-check-input" type="checkbox" name="case-sensitive" id="input-case-sensitive">
+                  <label class="form-check-label" for="input-case-sensitive">
+                    Case sensitive
+                  </label>
                 </div>
                 <div class="form-check mx-2">
                   <input class="form-check-input" type="radio" name="show-what" id="input-show-all" checked>
@@ -91,11 +95,8 @@
                     Local only
                   </label>
                 </div>
-                <div class="form-check mx-2">
-                  <input class="form-check-input" type="checkbox" name="case-sensitive" id="input-case-sensitive">
-                  <label class="form-check-label" for="input-case-sensitive">
-                    Case sensitive
-                  </label>
+                <div class="mx-2 text-muted">
+                  <span id="count">&hellip;</span> items
                 </div>
               </div>
               <table class="table">
@@ -113,8 +114,6 @@
             </div>
             <div class="tab-pane py-2" id="code" role="tabpanel" aria-labelledby="tab-code">
               <pre><code class="haskell"></code></pre>
-            </div>
-            <div class="tab-pane py-2" id="api" role="tabpanel" aria-labelledby="tab-api">
             </div>
           </div>
 
