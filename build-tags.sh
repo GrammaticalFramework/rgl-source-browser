@@ -117,7 +117,10 @@ build_index() {
     rm -f "$search_index_tmp"
     printf "[\n" >> "$search_index_tmp"
     prev_symbol=
-    cat "$tagsdir"/*.gf-tags | awk -F '\t' '{ if ($2 != "indir") { print $1"\t"$2"\t"$3 } }' | sort -u | while read symbol type location ; do
+    # Only consider modules without Dict in the name.
+    # TODO not safe for filenames containing whitespce, probably need to use find instead
+    files=$(ls "$tagsdir"/*.gf-tags | grep -v Dict)
+    cat $files | awk -F '\t' '{ if ($2 != "indir") { print $1"\t"$2"\t"$3 } }' | sort -u | while read symbol type location ; do
         if [ "$symbol" != "$prev_symbol"  ] ; then
             if [ "$prev_symbol" != ""  ] ; then
                 # End previous
@@ -142,4 +145,4 @@ build_index() {
 
 build_tags
 replace_paths
-# build_index
+build_index
