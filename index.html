@@ -39,34 +39,79 @@
         </div>
         <div class="col-8 col-md-9 col-lg-10 pt-3" id="col-main">
 
+          <div class="text-muted small float-right py-0">
+            John J. Camilleri, 2018<br>
+            <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
+              View on GitHub
+              <i class="fab fa-github"></i>
+            </a>
+          </div>
+          <div class="float-right">
+            <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
+          </div>
+
+          <div class="form-inline mb-2">
+            <div class="input-group mr-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" placeholder="Symbol search" aria-label="Module" id="input-filter">
+            </div>
+            <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
+            <div class="ml-2" id="loading">
+              <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
+            </div>
+          </div>
+
           <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item mt-2 mr-3">
+            <li class="nav-item">
+              <a class="nav-link active" id="tab-results" data-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="true">Results</a>
+            </li>
+            <li class="nav-item mt-2 mx-3">
               <div class="text-muted"><span id="current-module"></span></div>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" id="tab-scope" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="true">Scope</a>
+              <a class="nav-link" id="tab-scope" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="false">Scope</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="tab-code" data-toggle="tab" href="#code" role="tab" aria-controls="code" aria-selected="false">Code</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
-            </li>
-            <li class="nav-item mt-2" id="loading">
-              <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
-            </li>
-            <li class="nav-item ml-auto">
-              <div class="text-muted small text-right py-0">
-                John J. Camilleri, 2018<br>
-                <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
-                  View on GitHub
-                  <i class="fab fa-github"></i>
-                </a>
-              </div>
-            </li>
           </ul>
           <div class="tab-content" style="overflow:scroll">
-            <div class="tab-pane show active py-2" id="scope" role="tabpanel" aria-labelledby="tab-scope">
+
+            <div class="tab-pane show active py-2" id="results" role="tabpanel" aria-labelledby="tab-results">
+              <div class="row">
+                <div class="col-4">
+                  <table class="table" id="module-search-results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Module</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-8">
+                  <table class="table" id="defn-search-results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Symbol</th>
+                        <th scope="col">Judgement Type</th>
+                        <th scope="col">Module</th>
+                        <th scope="col">Function Type</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane show py-2" id="scope" role="tabpanel" aria-labelledby="tab-scope">
               <div class="form-inline mb-2">
                 <div class="input-group mr-2 w-25">
                   <div class="input-group-prepend">
@@ -108,10 +153,11 @@
                     <th scope="col">Function Type</th>
                   </tr>
                 </thead>
-                <tbody id="results">
+                <tbody id="scope-results">
                 </tbody>
               </table>
             </div>
+
             <div class="tab-pane py-2" id="code" role="tabpanel" aria-labelledby="tab-code">
               <pre><code class="haskell"></code></pre>
             </div>

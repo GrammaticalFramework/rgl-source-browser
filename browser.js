@@ -124,10 +124,10 @@ function App (oninit) {
   }
 
   this.clearScope = function (msg) {
-    $('#scope #results').empty()
+    $('#scope tbody').empty()
     t.updateScopeCount()
     if (msg) {
-      $('#scope #results').html('<tr><td colspan="5" class="text-center">' + msg + '</td></tr>')
+      $('#scope tbody').html('<tr><td colspan="5" class="text-center">' + msg + '</td></tr>')
     }
   }
   this.clearCode = function (msg) {
@@ -139,10 +139,10 @@ function App (oninit) {
   this.setCode = function (code) {
     var elem = $('#code pre code').text(code)
     hljs.highlightBlock(elem[0])
-    hljs.lineNumbersBlock(elem[0])
+    if (hljs.lineNumbersBlock) hljs.lineNumbersBlock(elem[0])
   }
   this.updateScopeCount = function () {
-    $('#scope #count').text($('#scope #results tr:visible').length)
+    $('#scope #count').text($('#scope tbody tr:visible').length)
   }
 
   // hash should be '#code'
@@ -290,7 +290,7 @@ function App (oninit) {
       dataType: 'text',
       success: function (data) {
         // var tbody = $('#scope table tbody')
-        var tbody = $('#scope #results')
+        var tbody = $('#scope tbody')
         // data.replace(/^(\S+)\s(\S+)\s(.+)?$/gm, function (a, b, c, d) {
         data.split('\n').forEach(function (line) {
           if (!line) return
@@ -412,13 +412,13 @@ function App (oninit) {
     var s = $('#scope #input-filter').val()
     try {
       if (s) {
-        $('#scope #results tr').hide()
-        $('#scope #results tr:match(\'' + s + '\')').show()
+        $('#scope tbody tr').hide()
+        $('#scope tbody tr:match(\'' + s + '\')').show()
       } else {
-        $('#scope #results tr').show()
+        $('#scope tbody tr').show()
       }
       if ($('#scope #input-show-local').is(':checked')) {
-        $('#scope #results tr.indir').hide()
+        $('#scope tbody tr.indir').hide()
       }
     } catch (error) {
       alert(error.message)

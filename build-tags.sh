@@ -120,7 +120,7 @@ build_index() {
     # Only consider modules without Dict in the name.
     # TODO not safe for filenames containing whitespce, probably need to use find instead
     files=$(ls "$tagsdir"/*.gf-tags | grep -v Dict)
-    cat $files | awk -F '\t' '{ if ($2 != "indir") { print $1"\t"$2"\t"$3 } }' | sort -u | while read symbol type location ; do
+    cat $files | awk -F '\t' '{ if ($2 != "indir") { print $1"\t"$2"\t"$3"\t"$4 } }' | sort -u | while read symbol jtype location ftype ; do
         if [ "$symbol" != "$prev_symbol"  ] ; then
             if [ "$prev_symbol" != ""  ] ; then
                 # End previous
@@ -133,8 +133,14 @@ build_index() {
         fi
         if ((x > 0)); then printf ",\n" >> "$search_index_tmp" ; fi
 
-        # Append location
-        printf "      { \"type\": \"%s\", \"location\": \"%s\" }" "$type" "$location" >> "$search_index_tmp"
+        # Append location and type info
+        printf "      { \"type\": \"%s\", \"location\": \"%s\", \"ftype\": \"%s\" }" "$jtype" "$location" "$ftype" >> "$search_index_tmp"
+        # printf "      { \"type\": \"%s\", \"location\": \"%s\"" "$jtype" "$location" >> "$search_index_tmp"
+        # if [ ! -z "$ftype" ] ; then
+        #     printf ", \"ftype\": \"%s\" }" "$ftype" >> "$search_index_tmp"
+        # else
+        #     printf " }" >> "$search_index_tmp"
+        # fi
         ((x+=1))
     done
     printf "    ]\n  }\n]" >> "$search_index_tmp"
