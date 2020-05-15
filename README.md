@@ -9,6 +9,29 @@ where it is kept up to date with the latest RGL.
 
 ## Local
 
+### Docker
+
+You can launch a Docker container running the browser with the latest RGL using:
+```
+$ ./run-docker.sh
+```
+This will take some time the first time you run it.
+Once building is complete you will see:
+```
+┌────────────────────────────────────────────────┐
+│                                                │
+│   Serving!                                     │
+│                                                │
+│   - Local:            http://localhost:5000    │
+│   - On Your Network:  http://172.17.0.2:5000   │
+│                                                │
+└────────────────────────────────────────────────┘
+```
+You can then browse to `http://localhost:41292` (not `5000`) in your browser to use it.
+When done, hit `Ctrl-C` in the terminal window running the container.
+
+### Manual
+
 The tool can also be run locally on a Linux/macOS.
 General steps:
 
