@@ -6,22 +6,36 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" integrity="sha256-3YM6A3pH4QFCl9WbSU8oXF5N6W/2ylvW0o2g+Z6TmLQ=" crossorigin="anonymous" />
-    <link rel="stylesheet" href="browser.css">
+    <link rel="stylesheet" href="app.css">
     <title>RGL Browser</title>
     <link rel="icon" href="data:,">
   </head>
   <body class="h-100">
     <div class="container-fluid">
 
-      <div class="row">
-        <div class="col-4 col-md-3 col-lg-2 bg-light pt-2" id="col-menu">
+      <div id="app" class="row" style="height: 100vh; overflow-y: hidden;">
 
-          <div class="mb-3">
+        <!-- Left pane -->
+        <div class="col-4 col-md-3 col-lg-2 bg-light py-2 h-100">
+
+          <div class="d-flex align-items-center mb-3">
             <img src="http://www.grammaticalframework.org/doc/Logos/gf1.svg" class="mr-2" style="height:2.5rem;">
-            <div class="navbar-brand align-middle">RGL Browser</div>
+            <div class="navbar-brand">
+              RGL Browser
+              <span class="badge badge-pill badge-secondary">v3</span>
+            </div>
           </div>
 
-          <form class="form-inline">
+          <!-- <h3 class="h6">History</h3> -->
+
+          <div class="h-100 overflow-y-scroll">
+            <div v-for="(item,ix) in history_reversed" :key="ix">
+              {{ item.language }} / {{ item.module }}
+              <span v-if="ix === 0">&rarr;</span>
+            </div>
+          </div>
+
+          <!-- <form class="form-inline">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">
@@ -35,53 +49,92 @@
             <i class="fab fa-readme mr-1"></i>
             Show API
           </button>
-          <nav class="list-group" id="menu"></nav>
+          <nav class="list-group" id="menu"></nav> -->
         </div>
-        <div class="col-8 col-md-9 col-lg-10 pt-3" id="col-main">
 
-          <div class="text-muted small float-right py-0">
-            John J. Camilleri, 2018<br>
-            <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
-              View on GitHub
-              <i class="fab fa-github"></i>
-            </a>
-          </div>
-          <div class="float-right">
-            <a class="nav-link border-0 text-muted" id="rgl-commit"></a> <!-- filled in dynamically -->
-          </div>
+        <!-- Right pane -->
+        <div class="col-8 col-md-9 col-lg-10 py-3 h-100">
 
-          <div class="form-inline mb-2">
-            <div class="input-group mr-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="fas fa-search"></i>
-                </span>
+          <!-- top bar -->
+          <div class="d-flex">
+            <div class="form-inline mb-2 flex-grow-1">
+              <div class="input-group flex-grow-1 mr-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                  </span>
+                </div>
+                <input type="text" class="form-control" v-model="search_term" placeholder="Search for language, module or identifier">
               </div>
-              <input type="text" class="form-control" placeholder="Symbol search" aria-label="Module" id="input-filter">
+              <!-- <button type="button" class="btn btn-secondary">Clear</button> -->
+              <div class="ml-2" v-show="show.loading">
+                <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
+              </div>
             </div>
-            <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
-            <div class="ml-2" id="loading">
-              <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
+
+            <div class="" v-if="rgl_commit">
+              <a class="nav-link border-0 text-muted" v-bind:href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit">
+                RGL
+                <i class="mx-1 fas fa-code-branch"></i>
+                {{ rgl_commit }}
+              </a>
             </div>
+
+            <div class="text-muted small py-0">
+              John J. Camilleri, 2020<br>
+              <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
+                View on GitHub
+                <i class="fab fa-github"></i>
+              </a>
+            </div>
+
           </div>
 
-          <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active" id="tab-results" data-toggle="tab" href="#results" role="tab" aria-controls="results" aria-selected="true">Results</a>
-            </li>
-            <li class="nav-item mt-2 mx-3">
-              <div class="text-muted"><span id="current-module"></span></div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="tab-scope" data-toggle="tab" href="#scope" role="tab" aria-controls="scope" aria-selected="false">Scope</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" id="tab-code" data-toggle="tab" href="#code" role="tab" aria-controls="code" aria-selected="false">Code</a>
-            </li>
-          </ul>
-          <div class="tab-content" style="overflow:scroll">
+          <div class="h-100">
 
-            <div class="tab-pane show active py-2" id="results" role="tabpanel" aria-labelledby="tab-results">
+            <!-- Results -->
+            <div class="row border rounded m-1 py-2" v-show="show.results">
+              <div class="col-4">
+                <h4 class="h6">Modules</h4>
+                <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">{{ r.module }}</a>
+              </div>
+              <div class="col-4">
+                <h4 class="h6">Scope</h4>
+                <a href="" v-for="(r,ix) in scope_results" :key="ix" class="d-block">{{ r }}</a>
+              </div>
+              <div class="col-4">
+                global results
+              </div>
+            </div>
+
+            <!-- Scope & Code -->
+            <div class="row h-100">
+              <div class="col-5 h-100 overflow-y-scroll" v-if="current.scope">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">Identifier</th>
+                      <th scope="col">Judgement Type</th>
+                      <th scope="col">Module</th>
+                      <th scope="col">Function Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item,ix) in current.scope" :key="ix">
+                      <td><code>{{ item.ident }}</code></td>
+                      <td>{{ item.jtype }}</td>
+                      <td><a href="" @click.prevent="selectModule()">{{ item.modloc }}</a></td>
+                      <td><code>{{ item.ftype }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-7 bg-light py-3 h-100 overflow-y-scroll" v-if="current.code">
+                <pre><code class="haskell" id="code">{{ current.code }}</code></pre>
+              </div>
+            </div>
+
+            <!-- <div class="tab-pane show active py-2" id="results" role="tabpanel" aria-labelledby="tab-results">
               <div class="row">
                 <div class="col-4">
                   <table class="table" id="module-search-results">
@@ -144,37 +197,21 @@
                   <span id="count">&hellip;</span> items
                 </div>
               </div>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Identifier</th>
-                    <th scope="col">Judgement Type</th>
-                    <th scope="col">Module</th>
-                    <th scope="col">Function Type</th>
-                  </tr>
-                </thead>
-                <tbody id="scope-results">
-                </tbody>
-              </table>
             </div>
 
-            <div class="tab-pane py-2" id="code" role="tabpanel" aria-labelledby="tab-code">
-              <pre><code class="haskell"></code></pre>
-            </div>
-          </div>
+          </div>--> <!-- main pane -->
 
         </div>
-      </div>
+      </div><!-- app -->
 
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script> -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js" integrity="sha256-T/f7Sju1ZfNNfBh7skWn0idlCBcI3RwdLSS4/I7NQKQ=" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/haskell.min.js" integrity="sha256-WxYLWg8NFyyEq+Zs9pVsDQmlFpJt+733DecPx5+hrQw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.5.0/highlightjs-line-numbers.min.js"></script>
-    <script src="jquery.history.min.js"></script>
-    <script src="browser.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
