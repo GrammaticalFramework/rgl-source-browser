@@ -27,7 +27,7 @@ Once building is complete you will see:
 │                                                │
 └────────────────────────────────────────────────┘
 ```
-You can then browse to `http://localhost:41292` (not `5000`) in your browser to use it.
+You can then browse to `http://localhost:5000` in your browser to use it.
 When done, hit `Ctrl-C` in the terminal window running the container.
 
 ### Manual
