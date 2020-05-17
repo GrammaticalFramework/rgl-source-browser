@@ -79,14 +79,9 @@ new Vue({ // eslint-disable-line no-new
       this.search_terms = this.search_term.toLowerCase().split(/ +/).filter(s => s.length > 2)
       this.show.results = true
     },
-    // 'current.code': function () {
-    //   const elem = document.querySelector('#code')
-    //   if (!elem) return
-    //   Vue.nextTick(() => {
-    //     hljs.highlightBlock(elem)
-    //     if (hljs.lineNumbersBlock) hljs.lineNumbersBlock(elem)
-    //   })
-    // }
+    'current.code': function () {
+      Vue.nextTick(this.highlightCode)
+    },
   },
   mounted: function () {
     axios.get(INDEX_PATH)
@@ -183,6 +178,12 @@ new Vue({ // eslint-disable-line no-new
         }
         return l[0] // no preferred default, just return first
       }
+    },
+    highlightCode: function () {
+      const elem = document.querySelector('#code')
+      if (!elem) return
+      hljs.highlightBlock(elem)
+      if (hljs.lineNumbersBlock) hljs.lineNumbersBlock(elem)
     }
   }
 })

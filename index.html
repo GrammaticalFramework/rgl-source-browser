@@ -144,7 +144,7 @@
           <!-- Code -->
           <div class="col-6 h-100 overflow-y-scroll" v-show="show.code && current.code">
             <h4 class="h5">Code: <code>{{ current.module }}</code></h4>
-            <pre class="bg-light p-2 mb-5"><code class="haskell" id="code">{{ current.code }}</code></pre>
+            <pre class="bg-light p-2 mb-5"><code class="haskell" id="code" v-html="current.code"></code></pre>
           </div>
         </div>
 

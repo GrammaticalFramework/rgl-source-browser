@@ -1,3 +1,9 @@
 .overflow-y-scroll {
   overflow-y: scroll;
 }
+
+.hljs-ln td.hljs-ln-numbers {
+  text-align: right;
+  color: #ccc;
+  padding-right: 1rem;
+}
