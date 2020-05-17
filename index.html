@@ -10,201 +10,146 @@
     <title>RGL Browser</title>
     <link rel="icon" href="data:,">
   </head>
-  <body class="h-100">
-    <div class="container-fluid">
+  <body>
+    <div id="app" style="height: 100vh; overflow-y: hidden;">
 
-      <div id="app" class="row" style="height: 100vh; overflow-y: hidden;">
+      <div class="position-absolute" style="top: calc(50vh - 2rem); left: calc(50vw - 2rem); z-index: 100; opacity: 0.7;" v-show="show.loading">
+        <i class="fas fa-circle-notch fa-spin text-danger fa-4x"></i>
+      </div>
 
-        <!-- Left pane -->
-        <div class="col-4 col-md-3 col-lg-2 bg-light py-2 h-100">
+      <!-- Top bar -->
+      <div class="d-flex bg-light border-bottom p-3 align-items-center">
 
-          <div class="d-flex align-items-center mb-3">
-            <img src="http://www.grammaticalframework.org/doc/Logos/gf1.svg" class="mr-2" style="height:2.5rem;">
-            <div class="navbar-brand">
-              RGL Browser
-              <span class="badge badge-pill badge-secondary">v3</span>
-            </div>
-          </div>
-
-          <!-- <h3 class="h6">History</h3> -->
-
-          <div class="h-100 overflow-y-scroll">
-            <div v-for="(item,ix) in history_reversed" :key="ix">
-              {{ item.language }} / {{ item.module }}
-              <span v-if="ix === 0">&rarr;</span>
-            </div>
-          </div>
-
-          <!-- <form class="form-inline">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="fas fa-search"></i>
-                </span>
-              </div>
-              <input type="text" class="form-control" placeholder="Module search" aria-label="Module search" id="input-module-search">
-            </div>
-          </form>
-          <button class="btn btn-secondary w-100 my-1" id="btn-api">
-            <i class="fab fa-readme mr-1"></i>
-            Show API
-          </button>
-          <nav class="list-group" id="menu"></nav> -->
+        <img src="http://www.grammaticalframework.org/doc/Logos/gf1.svg" class="mr-2" style="height:2.5rem;">
+        <div class="navbar-brand">
+          RGL Browser
+          <span class="badge badge-pill badge-secondary">v3</span>
         </div>
 
-        <!-- Right pane -->
-        <div class="col-8 col-md-9 col-lg-10 py-3 h-100">
-
-          <!-- top bar -->
-          <div class="d-flex">
-            <div class="form-inline mb-2 flex-grow-1">
-              <div class="input-group flex-grow-1 mr-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">
-                    <i class="fas fa-search"></i>
-                  </span>
-                </div>
-                <input type="text" class="form-control" v-model="search_term" placeholder="Search for language, module or identifier">
-              </div>
-              <!-- <button type="button" class="btn btn-secondary">Clear</button> -->
-              <div class="ml-2" v-show="show.loading">
-                <i class="fas fa-circle-notch fa-spin text-danger" style="font-size:1.5em"></i>
-              </div>
+        <div class="form-inline flex-grow-1 mr-2">
+          <div class="input-group flex-grow-1 mr-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
             </div>
+            <input type="text" class="form-control" v-model="search_term" placeholder="Search for language, module or identifier" @focus="show.results = true">
+          </div>
+          <button type="button" class="btn btn-secondary" @click="search_term = null">Clear</button>
+        </div>
 
-            <div class="" v-if="rgl_commit">
-              <a class="nav-link border-0 text-muted" v-bind:href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit">
-                RGL
-                <i class="mx-1 fas fa-code-branch"></i>
-                {{ rgl_commit }}
+        <button type="button" class="btn btn-link" @click="show.history = !show.history" :class="{ 'text-secondary' : !show.history }" title="Show/hide history">
+          <i class="fas fa-history"></i>
+        </button>
+        <button type="button" class="btn btn-link" @click="show.scope = !show.scope" :class="{ 'text-secondary' : !show.scope }" title="Show/hide scope">
+          <i class="fas fa-binoculars"></i>
+        </button>
+        <button type="button" class="btn btn-link" @click="show.code = !show.code" :class="{ 'text-secondary' : !show.code }" title="Show/hide code">
+          <i class="fas fa-code"></i>
+        </button>
+
+
+        <div v-if="rgl_commit">
+          <a class="nav-link border-0 text-muted" v-bind:href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit">
+            RGL
+            <i class="mx-1 fas fa-code-branch"></i>
+            {{ rgl_commit }}
+          </a>
+        </div>
+
+        <div class="text-muted small py-0">
+          John J. Camilleri, 2020<br>
+          <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
+            View on GitHub
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Main pane -->
+      <div class="h-100 p-3">
+
+        <!-- Results -->
+        <div class="row h-100" v-show="show.results && search_term">
+          <!-- <div class="col-12">
+            <h3 class="h4">Results</h3>
+          </div> -->
+          <div class="col-4 h-100">
+            <h4 class="h5">Matching modules</h4>
+            <div class="h-100 overflow-y-scroll">
+              <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
+                {{ r.language }}/{{ r.module }}
               </a>
             </div>
-
-            <div class="text-muted small py-0">
-              John J. Camilleri, 2020<br>
-              <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
-                View on GitHub
-                <i class="fab fa-github"></i>
-              </a>
+          </div>
+          <div class="col-4 h-100" v-show="current.scope">
+            <h4 class="h5">Matches in scope of <code>{{ current.module }}</code></h4>
+            <div class="h-100 overflow-y-scroll">
+              <a href="" v-for="(r,ix) in scope_results" :key="ix" class="d-block">{{ r }}</a>
             </div>
+            <div v-if="!current.scope">
+              <em>No module selected</em>
+            </div>
+          </div>
+          <div class="col-4 h-100">
+            <h4 class="h5">Global search</h4>
+            <button class="btn btn-secondary">Search all modules</button>
+            <em>This will be slow</em>
+          </div>
+        </div>
 
+        <!-- Scope & Code -->
+        <div class="row h-100" v-show="!show.results">
+
+          <!-- History -->
+          <div class="col-2 h-100 overflow-y-scroll" v-show="show.history && history.length">
+            <h4 class="h5">History</h4>
+            <a v-for="(item,ix) in history_reversed" :key="ix"
+              href="" @click.prevent="selectModule(item.language, item.module)"
+              class="d-block px-2 py-1 rounded"
+              :class="{ 'bg-primary text-white' : ix === 0 }">
+              {{ item.language }}/{{ item.module }}
+              <span v-if="ix === 0" class="float-right">&rarr;</span>
+            </a>
           </div>
 
-          <div class="h-100">
+          <!-- Scope -->
+          <div class="col-4 h-100 overflow-y-scroll" v-show="show.scope && current.scope">
+            <h4 class="h5">Scope: <code>{{ current.module }}</code></h4>
+            <table class="table table-sm">
+              <!-- <thead>
+                <tr>
+                  <th scope="col">Identifier</th>
+                  <th scope="col">Judgement Type</th>
+                  <th scope="col">Module</th>
+                  <th scope="col">Function Type</th>
+                </tr>
+              </thead> -->
+              <tbody>
+                <tr v-for="(item,ix) in current.scope" :key="ix">
+                  <td><code class="text-nowrap">{{ item.ident }}</code></td>
+                  <td>{{ item.jtype }}</td>
+                  <td>
+                    <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
+                      {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
+                    </a>
+                  </td>
+                  <td><code>{{ item.ftype }}</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <!-- Results -->
-            <div class="row border rounded m-1 py-2" v-show="show.results">
-              <div class="col-4">
-                <h4 class="h6">Modules</h4>
-                <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">{{ r.module }}</a>
-              </div>
-              <div class="col-4">
-                <h4 class="h6">Scope</h4>
-                <a href="" v-for="(r,ix) in scope_results" :key="ix" class="d-block">{{ r }}</a>
-              </div>
-              <div class="col-4">
-                global results
-              </div>
-            </div>
-
-            <!-- Scope & Code -->
-            <div class="row h-100">
-              <div class="col-5 h-100 overflow-y-scroll" v-if="current.scope">
-                <table class="table table-sm">
-                  <thead>
-                    <tr>
-                      <th scope="col">Identifier</th>
-                      <th scope="col">Judgement Type</th>
-                      <th scope="col">Module</th>
-                      <th scope="col">Function Type</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(item,ix) in current.scope" :key="ix">
-                      <td><code>{{ item.ident }}</code></td>
-                      <td>{{ item.jtype }}</td>
-                      <td><a href="" @click.prevent="selectModule()">{{ item.modloc }}</a></td>
-                      <td><code>{{ item.ftype }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="col-7 bg-light py-3 h-100 overflow-y-scroll" v-if="current.code">
-                <pre><code class="haskell" id="code">{{ current.code }}</code></pre>
-              </div>
-            </div>
-
-            <!-- <div class="tab-pane show active py-2" id="results" role="tabpanel" aria-labelledby="tab-results">
-              <div class="row">
-                <div class="col-4">
-                  <table class="table" id="module-search-results">
-                    <thead>
-                      <tr>
-                        <th scope="col">Module</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="col-8">
-                  <table class="table" id="defn-search-results">
-                    <thead>
-                      <tr>
-                        <th scope="col">Symbol</th>
-                        <th scope="col">Judgement Type</th>
-                        <th scope="col">Module</th>
-                        <th scope="col">Function Type</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-pane show py-2" id="scope" role="tabpanel" aria-labelledby="tab-scope">
-              <div class="form-inline mb-2">
-                <div class="input-group mr-2 w-25">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">
-                      <i class="fas fa-filter"></i>
-                    </span>
-                  </div>
-                  <input type="text" class="form-control" placeholder="Filter" aria-label="Module" id="input-filter">
-                </div>
-                <button type="button" class="btn btn-secondary" id="btn-clear">Clear</button>
-                <div class="form-check mx-2">
-                  <input class="form-check-input" type="checkbox" name="case-sensitive" id="input-case-sensitive">
-                  <label class="form-check-label" for="input-case-sensitive">
-                    Case sensitive
-                  </label>
-                </div>
-                <div class="form-check mx-2">
-                  <input class="form-check-input" type="radio" name="show-what" id="input-show-all" checked>
-                  <label class="form-check-label" for="input-show-all">
-                    Show all
-                  </label>
-                </div>
-                <div class="form-check mx-2">
-                  <input class="form-check-input" type="radio" name="show-what" id="input-show-local">
-                  <label class="form-check-label" for="input-show-local">
-                    Local only
-                  </label>
-                </div>
-                <div class="mx-2 text-muted">
-                  <span id="count">&hellip;</span> items
-                </div>
-              </div>
-            </div>
-
-          </div>--> <!-- main pane -->
-
+          <!-- Code -->
+          <div class="col-6 h-100 overflow-y-scroll" v-show="show.code && current.code">
+            <h4 class="h5">Code: <code>{{ current.module }}</code></h4>
+            <pre class="bg-light p-2 mb-5"><code class="haskell" id="code">{{ current.code }}</code></pre>
+          </div>
         </div>
-      </div><!-- app -->
 
-    </div>
+      </div>
+    </div><!-- app -->
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js" integrity="sha256-T/f7Sju1ZfNNfBh7skWn0idlCBcI3RwdLSS4/I7NQKQ=" crossorigin="anonymous"></script>
