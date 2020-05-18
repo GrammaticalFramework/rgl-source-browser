@@ -99,7 +99,7 @@ new Vue({ // eslint-disable-line no-new
       if (!this.search_term) {
         this.show.results = false
       } else {
-        this.search_terms = this.search_term.toLowerCase().split(/ +/) // .filter(s => s.length > 2)
+        this.search_terms = this.search_term.toLowerCase().split(/ +/).filter(s => s.length > 1)
         this.show.results = true
       }
     },
@@ -125,10 +125,35 @@ new Vue({ // eslint-disable-line no-new
       })
   },
   methods: {
-    selectModule: function (lang, module, lines = null) { // TODO lines
+    selectModule: function (lang, module, ident = null, lines = null) {
+      const addToHistory = () => {
+        // Store history of idents/line numbers within module history
+        let histItem
+        const histItemIx = this.history.findIndex(h => h.language === lang && h.module === module)
+        if (histItemIx > -1) {
+          histItem = this.history[histItemIx]
+          this.history.splice(histItemIx, 1)
+          if (lines && histItem.locations.findIndex(l => l.lines === lines) < 0) {
+            histItem.locations.push({
+              ident: ident,
+              lines: lines
+            })
+            histItem.locations.sort((a, b) => parseInt(a.lines) - parseInt(b.lines))
+          }
+        } else {
+          histItem = {
+            language: lang,
+            module: module,
+            locations: []
+          }
+        }
+        this.history.push(histItem)
+      }
+
       this.show.results = false
       if (lang === this.current.language && module === this.current.module) {
         if (lines) {
+          addToHistory()
           this.scrollToLine(parseInt(lines))
         }
         return
@@ -156,16 +181,8 @@ new Vue({ // eslint-disable-line no-new
       ]).then(() => {
         this.current.language = lang
         this.current.module = module
-
-        // TODO store history of idents/line numbers within module history
-        this.history = this.history.filter(h => !(h.language === lang && h.module === module))
-        this.history.push({
-          language: lang,
-          module: module
-        })
-
+        addToHistory()
         document.querySelector('title').innerText = `${lang}/${module} - RGL Browser`
-
         this.show.loading = false
 
         if (lines) {
@@ -234,7 +251,7 @@ new Vue({ // eslint-disable-line no-new
       codeElem.scrollTo({
         left: 0,
         top: lineElem.parentElement.offsetTop,
-        behavior: 'smooth'
+        behavior: 'auto' // jump
       })
     }
   }

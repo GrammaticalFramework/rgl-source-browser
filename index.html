@@ -94,7 +94,7 @@
                     <td><code class="text-nowrap">{{ item.ident }}</code></td>
                     <td>{{ item.jtype }}</td>
                     <td>
-                      <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
+                      <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines)">
                         {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                       </a>
                     </td>
@@ -118,13 +118,18 @@
           <div :class="'col-'+cols_history" class="h-100 overflow-y-scroll" v-show="show.history">
             <h4 class="h5">History</h4>
             <em class="text-muted" v-show="!history.length">No recent modules</em>
-            <a v-for="(item,ix) in history_reversed" :key="ix"
-              href="" @click.prevent="selectModule(item.language, item.module)"
+            <div v-for="(item,ix) in history_reversed" :key="ix">
+              <a href="" @click.prevent="selectModule(item.language, item.module)"
               class="d-block px-2 py-1 rounded"
-              :class="{ 'bg-primary text-white' : ix === 0 }">
-              {{ item.language }}/{{ item.module }}
-              <span v-if="ix === 0" class="float-right">&rarr;</span>
-            </a>
+              :class="{ 'bg-primary text-white mb-1' : ix === 0 }">
+                {{ item.language }}/{{ item.module }}
+                <span v-if="ix === 0" class="float-right">&rarr;</span>
+              </a>
+              <a v-for="(loc,iy) in item.locations" :key="iy" class="d-block ml-3 small text-secondary"
+              href=""  @click.prevent="selectModule(item.language, item.module, loc.ident, loc.lines)">
+                <code>{{ loc.ident }}</code>:{{ loc.lines }}
+              </a>
+            </div>
           </div>
 
           <!-- Scope -->
@@ -146,7 +151,7 @@
                     <td><code class="text-nowrap">{{ item.ident }}</code></td>
                     <td>{{ item.jtype }}</td>
                     <td>
-                      <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
+                      <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines)">
                         {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                       </a>
                     </td>
