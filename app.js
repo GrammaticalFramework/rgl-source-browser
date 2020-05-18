@@ -30,6 +30,27 @@ new Vue({ // eslint-disable-line no-new
     history: []
   },
   computed: {
+    cols_history: function () {
+      return 2
+    },
+    cols_scope: function () {
+      if (this.show.history) {
+        if (this.show.code) return 4
+        else return 12 - this.cols_history
+      } else {
+        if (this.show.code) return 5
+        else return 12
+      }
+    },
+    cols_code: function () {
+      if (this.show.history) {
+        if (this.show.scope) return 6
+        else return 12 - this.cols_history
+      } else {
+        if (this.show.scope) return 7
+        else return 12
+      }
+    },
     history_reversed: function () {
       return this.history.reverse()
     },
@@ -103,31 +124,50 @@ new Vue({ // eslint-disable-line no-new
   methods: {
     selectModule: function (lang, module, lines = null) { // TODO lines
       if (lang === this.current.language && module === this.current.module) {
-        // TODO just scroll
+        if (lines) {
+          this.scrollToLine(parseInt(lines))
+        }
         return
       }
+      this.current.scope = null
+      this.current.code = null
       this.show.loading = true
       this.show.results = false
       Promise.all([
         axios.get(`${this.index.tags_path}/${module}.gf-tags`)
           .then(resp => {
             this.current.scope = this.processTags(resp.data)
+          })
+          .catch(err => {
+            console.error(err)
+            this.current.scope = null
           }),
         axios.get(`${this.index.src_path}/${lang}/${module}.gf`)
           .then(resp => {
             this.current.code = resp.data
+          })
+          .catch(err => {
+            console.error(err)
+            this.current.code = null
           }),
       ]).then(() => {
         this.current.language = lang
         this.current.module = module
 
+        // TODO store history of idents/line numbers within module history
         this.history = this.history.filter(h => !(h.language === lang && h.module === module))
         this.history.push({
           language: lang,
           module: module,
         })
 
+        document.querySelector('title').innerText = `${lang}/${module} - RGL Browser`
+
         this.show.loading = false
+
+        if (lines) {
+          this.scrollToLine(parseInt(lines))
+        }
       })
     },
     processTags: function (raw) {
@@ -180,10 +220,21 @@ new Vue({ // eslint-disable-line no-new
       }
     },
     highlightCode: function () {
-      const elem = document.querySelector('#code')
+      const elem = document.querySelector('#code pre code')
       if (!elem) return
       hljs.highlightBlock(elem)
       if (hljs.lineNumbersBlock) hljs.lineNumbersBlock(elem)
+    },
+    scrollToLine: function (line) {
+      const codeElem = document.querySelector('#code')
+      const lineElem = document.querySelector(`#code [data-line-number="${line}"]`)
+      // codeElem.scrollTop // how much pane is scrolled
+      // const y = Math.max(lineElem.offsetTop - codeElem.offsetTop - 75, 0)
+      codeElem.scrollTo({
+        left: 0,
+        top: lineElem.parentElement.offsetTop,
+        behavior: 'smooth'
+      })
     }
   }
 })

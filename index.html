@@ -103,7 +103,7 @@
         <div class="row h-100" v-show="!show.results">
 
           <!-- History -->
-          <div class="col-2 h-100 overflow-y-scroll" v-show="show.history && history.length">
+          <div :class="'col-'+cols_history" class="h-100 overflow-y-scroll" v-show="show.history">
             <h4 class="h5">History</h4>
             <a v-for="(item,ix) in history_reversed" :key="ix"
               href="" @click.prevent="selectModule(item.language, item.module)"
@@ -115,36 +115,38 @@
           </div>
 
           <!-- Scope -->
-          <div class="col-4 h-100 overflow-y-scroll" v-show="show.scope && current.scope">
+          <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope">
             <h4 class="h5">Scope: <code>{{ current.module }}</code></h4>
-            <table class="table table-sm">
-              <!-- <thead>
-                <tr>
-                  <th scope="col">Identifier</th>
-                  <th scope="col">Judgement Type</th>
-                  <th scope="col">Module</th>
-                  <th scope="col">Function Type</th>
-                </tr>
-              </thead> -->
-              <tbody>
-                <tr v-for="(item,ix) in current.scope" :key="ix">
-                  <td><code class="text-nowrap">{{ item.ident }}</code></td>
-                  <td>{{ item.jtype }}</td>
-                  <td>
-                    <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
-                      {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
-                    </a>
-                  </td>
-                  <td><code>{{ item.ftype }}</code></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <!-- <thead>
+                  <tr>
+                    <th scope="col">Identifier</th>
+                    <th scope="col">Judgement Type</th>
+                    <th scope="col">Module</th>
+                    <th scope="col">Function Type</th>
+                  </tr>
+                </thead> -->
+                <tbody>
+                  <tr v-for="(item,ix) in current.scope" :key="ix">
+                    <td><code class="text-nowrap">{{ item.ident }}</code></td>
+                    <td>{{ item.jtype }}</td>
+                    <td>
+                      <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
+                        {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
+                      </a>
+                    </td>
+                    <td><code>{{ item.ftype }}</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Code -->
-          <div class="col-6 h-100 overflow-y-scroll" v-show="show.code && current.code">
+          <div :class="'col-'+cols_code" class="h-100 overflow-y-scroll" v-show="show.code" id="code">
             <h4 class="h5">Code: <code>{{ current.module }}</code></h4>
-            <pre class="bg-light p-2 mb-5"><code class="haskell" id="code" v-html="current.code"></code></pre>
+            <pre class="bg-light p-2 mb-5"><code class="haskell" v-html="current.code"></code></pre>
           </div>
         </div>
 
