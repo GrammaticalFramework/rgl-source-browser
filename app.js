@@ -90,7 +90,7 @@ new Vue({ // eslint-disable-line no-new
         return []
       }
       return this.current.scope.filter(sc =>
-        ss.every(s => sc.toString().includes(s))
+        ss.every(s => sc.ident.toLowerCase().includes(s))
       )
     }
   },

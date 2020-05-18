@@ -68,24 +68,38 @@
           <!-- <div class="col-12">
             <h3 class="h4">Results</h3>
           </div> -->
-          <div class="col-4 h-100">
+          <div class="col-4 h-100 overflow-y-scroll">
             <h4 class="h5">Matching modules</h4>
-            <div class="h-100 overflow-y-scroll">
-              <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
-                {{ r.language }}/{{ r.module }}
-              </a>
-            </div>
+            <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
+              {{ r.language }}/{{ r.module }}
+            </a>
           </div>
-          <div class="col-4 h-100" v-show="current.scope">
+          <div class="col-4 h-100 overflow-y-scroll" v-show="current.scope">
             <h4 class="h5">Matches in scope of <code>{{ current.module }}</code></h4>
-            <div class="h-100 overflow-y-scroll">
-              <a href="" v-for="(r,ix) in scope_results" :key="ix" class="d-block">{{ r }}</a>
-            </div>
-            <div v-if="!current.scope">
-              <em>No module selected</em>
-            </div>
+            <table class="table table-sm">
+              <!-- <thead>
+                <tr>
+                  <th scope="col">Identifier</th>
+                  <th scope="col">Judgement Type</th>
+                  <th scope="col">Module</th>
+                  <th scope="col">Function Type</th>
+                </tr>
+              </thead> -->
+              <tbody>
+                <tr v-for="(item,ix) in scope_results" :key="ix">
+                  <td><code class="text-nowrap">{{ item.ident }}</code></td>
+                  <td>{{ item.jtype }}</td>
+                  <td>
+                    <a href="" @click.prevent="selectModule(item.language, item.module, item.lines)">
+                      {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
+                    </a>
+                  </td>
+                  <td><code>{{ item.ftype }}</code></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="col-4 h-100 d-none">
+          <div class="col-4 h-100 overflow-y-scroll d-none">
             <h4 class="h5">Global search</h4>
             <button class="btn btn-secondary">Search all modules</button>
             <em>This will be slow</em>
