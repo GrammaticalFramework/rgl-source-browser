@@ -48,22 +48,15 @@
           <i class="fas fa-code"></i>
         </button>
 
+        <a v-if="rgl_commit" class="nav-link text-muted"
+          :href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit"
+          :title="'RGL commit ' + rgl_commit">
+          <i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit }}
+        </a>
 
-        <div v-if="rgl_commit">
-          <a class="nav-link border-0 text-muted" v-bind:href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit">
-            RGL
-            <i class="mx-1 fas fa-code-branch"></i>
-            {{ rgl_commit }}
-          </a>
-        </div>
-
-        <div class="text-muted small py-0">
-          John J. Camilleri, 2020<br>
-          <a href="https://github.com/GrammaticalFramework/rgl-source-browser">
-            View on GitHub
-            <i class="fab fa-github"></i>
-          </a>
-        </div>
+        <a class="nav-link text-muted" href="https://github.com/GrammaticalFramework/rgl-source-browser" title="View on GitHub">
+          <i class="fab fa-github"></i>
+        </a>
 
       </div>
 
@@ -92,7 +85,7 @@
               <em>No module selected</em>
             </div>
           </div>
-          <div class="col-4 h-100">
+          <div class="col-4 h-100 d-none">
             <h4 class="h5">Global search</h4>
             <button class="btn btn-secondary">Search all modules</button>
             <em>This will be slow</em>
@@ -105,6 +98,7 @@
           <!-- History -->
           <div :class="'col-'+cols_history" class="h-100 overflow-y-scroll" v-show="show.history">
             <h4 class="h5">History</h4>
+            <em class="text-muted" v-show="!history.length">No recent modules</em>
             <a v-for="(item,ix) in history_reversed" :key="ix"
               href="" @click.prevent="selectModule(item.language, item.module)"
               class="d-block px-2 py-1 rounded"
@@ -117,6 +111,7 @@
           <!-- Scope -->
           <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope">
             <h4 class="h5">Scope: <code>{{ current.module }}</code></h4>
+            <em class="text-muted" v-show="!current.scope">No module scope loaded</em>
             <div class="table-responsive">
               <table class="table table-sm">
                 <!-- <thead>
@@ -146,7 +141,7 @@
           <!-- Code -->
           <div :class="'col-'+cols_code" class="h-100 overflow-y-scroll" v-show="show.code" id="code">
             <h4 class="h5">Code: <code>{{ current.module }}</code></h4>
-            <pre class="bg-light p-2 mb-5"><code class="haskell" v-html="current.code"></code></pre>
+            <pre class="bg-light p-2 mb-5"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code"></code></pre>
           </div>
         </div>
 
