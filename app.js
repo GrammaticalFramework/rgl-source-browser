@@ -1,5 +1,4 @@
 /* global Vue axios hljs */
-/* eslint-disable comma-dangle */
 
 // Path to data
 const INDEX_PATH = 'data/index.json'
@@ -19,13 +18,13 @@ new Vue({ // eslint-disable-line no-new
       loading: true,
       history: true,
       scope: true,
-      code: true,
+      code: true
     },
     current: {
       language: null,
       module: null,
       scope: null,
-      code: null,
+      code: null
     },
     history: []
   },
@@ -102,7 +101,7 @@ new Vue({ // eslint-disable-line no-new
     },
     'current.code': function () {
       Vue.nextTick(this.highlightCode)
-    },
+    }
   },
   mounted: function () {
     axios.get(INDEX_PATH)
@@ -149,7 +148,7 @@ new Vue({ // eslint-disable-line no-new
           .catch(err => {
             console.error(err)
             this.current.code = null
-          }),
+          })
       ]).then(() => {
         this.current.language = lang
         this.current.module = module
@@ -158,7 +157,7 @@ new Vue({ // eslint-disable-line no-new
         this.history = this.history.filter(h => !(h.language === lang && h.module === module))
         this.history.push({
           language: lang,
-          module: module,
+          module: module
         })
 
         document.querySelector('title').innerText = `${lang}/${module} - RGL Browser`
@@ -228,8 +227,6 @@ new Vue({ // eslint-disable-line no-new
     scrollToLine: function (line) {
       const codeElem = document.querySelector('#code')
       const lineElem = document.querySelector(`#code [data-line-number="${line}"]`)
-      // codeElem.scrollTop // how much pane is scrolled
-      // const y = Math.max(lineElem.offsetTop - codeElem.offsetTop - 75, 0)
       codeElem.scrollTo({
         left: 0,
         top: lineElem.parentElement.offsetTop,
