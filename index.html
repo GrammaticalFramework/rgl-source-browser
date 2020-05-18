@@ -33,7 +33,7 @@
                 <i class="fas fa-search"></i>
               </span>
             </div>
-            <input type="text" class="form-control" v-model="search_term" placeholder="Search for language, module or identifier" @focus="show.results = true">
+            <input type="text" class="form-control" v-model="search_term" placeholder="Search for language, module or identifier" @focus="if (search_term) show.results = true">
           </div>
           <button type="button" class="btn btn-secondary" @click="search_term = null">Clear</button>
         </div>
@@ -64,18 +64,18 @@
       <div class="h-100 p-3">
 
         <!-- Results -->
-        <div class="row h-100" v-show="show.results && search_term">
+        <div class="row h-100" v-show="show.results">
           <!-- <div class="col-12">
             <h3 class="h4">Results</h3>
           </div> -->
-          <div class="col-4 h-100 overflow-y-scroll">
+          <div class="col-2 h-100 overflow-y-scroll">
             <h4 class="h5">Matching modules</h4>
             <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
               {{ r.language }}/{{ r.module }}
             </a>
           </div>
-          <div class="col-4 h-100 overflow-y-scroll" v-show="current.scope">
-            <h4 class="h5">Matches in scope of <code>{{ current.module }}</code></h4>
+          <div class="col-4 h-100 overflow-y-scroll">
+            <h4 class="h5">Matches in scope: <code>{{ current.module }}</code></h4>
             <table class="table table-sm">
               <!-- <thead>
                 <tr>
@@ -99,9 +99,9 @@
               </tbody>
             </table>
           </div>
-          <div class="col-4 h-100 overflow-y-scroll d-none">
+          <div class="col-6 h-100 overflow-y-scroll">
             <h4 class="h5">Global search</h4>
-            <button class="btn btn-secondary">Search all modules</button>
+            <button class="btn btn-secondary disabled">Search all modules</button>
             <em>This will be slow</em>
           </div>
         </div>
@@ -124,7 +124,7 @@
 
           <!-- Scope -->
           <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope">
-            <h4 class="h5">Scope: <code>{{ current.module }}</code></h4>
+            <h4 class="h5">Full scope: <code>{{ current.module }}</code></h4>
             <em class="text-muted" v-show="!current.scope">No module scope loaded</em>
             <div class="table-responsive">
               <table class="table table-sm">

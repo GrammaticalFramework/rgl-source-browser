@@ -96,8 +96,12 @@ new Vue({ // eslint-disable-line no-new
   },
   watch: {
     search_term: function () {
-      this.search_terms = this.search_term.toLowerCase().split(/ +/).filter(s => s.length > 2)
-      this.show.results = true
+      if (!this.search_term) {
+        this.show.results = false
+      } else {
+        this.search_terms = this.search_term.toLowerCase().split(/ +/) // .filter(s => s.length > 2)
+        this.show.results = true
+      }
     },
     'current.code': function () {
       Vue.nextTick(this.highlightCode)
@@ -122,6 +126,7 @@ new Vue({ // eslint-disable-line no-new
   },
   methods: {
     selectModule: function (lang, module, lines = null) { // TODO lines
+      this.show.results = false
       if (lang === this.current.language && module === this.current.module) {
         if (lines) {
           this.scrollToLine(parseInt(lines))
@@ -131,7 +136,6 @@ new Vue({ // eslint-disable-line no-new
       this.current.scope = null
       this.current.code = null
       this.show.loading = true
-      this.show.results = false
       Promise.all([
         axios.get(`${this.index.tags_path}/${module}.gf-tags`)
           .then(resp => {
