@@ -134,7 +134,7 @@ build_index() {
         if ((x > 0)); then printf ",\n" >> "$search_index_tmp" ; fi
 
         # Append location and type info
-        printf "      { \"type\": \"%s\", \"location\": \"%s\", \"ftype\": \"%s\" }" "$jtype" "$location" "$ftype" >> "$search_index_tmp"
+        printf "      { \"jtype\": \"%s\", \"location\": \"%s\", \"ftype\": \"%s\" }" "$jtype" "$location" "$ftype" >> "$search_index_tmp"
         # printf "      { \"type\": \"%s\", \"location\": \"%s\"" "$jtype" "$location" >> "$search_index_tmp"
         # if [ ! -z "$ftype" ] ; then
         #     printf ", \"ftype\": \"%s\" }" "$ftype" >> "$search_index_tmp"

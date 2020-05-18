@@ -2,6 +2,7 @@
 
 // Path to data
 const INDEX_PATH = 'data/index.json'
+const SEARCH_INDEX_PATH = 'data/search.json'
 
 const defaultLangs = ['abstract', 'api', 'common', 'prelude']
 
@@ -9,6 +10,7 @@ new Vue({ // eslint-disable-line no-new
   el: '#app',
   data: {
     index: null,
+    search_index: null,
     lookup: [],
     rgl_commit: null,
     search_term: null, // linked to input
@@ -92,6 +94,22 @@ new Vue({ // eslint-disable-line no-new
       return this.current.scope.filter(sc =>
         ss.every(s => sc.ident.toLowerCase().includes(s))
       )
+    },
+    global_results: function () {
+      if (this.search_index && this.search_term && this.search_term.length > 2) {
+        const res = find(this.search_index, this.search_term)
+        if (res) {
+          res.hits.forEach(h => {
+            const bits = h.location.split(/[/.:]/)
+            h.language = bits[0]
+            h.module = bits[1]
+            h.lines = bits[3]
+          })
+        }
+        return res
+      } else {
+        return null
+      }
     }
   },
   watch: {
@@ -108,23 +126,35 @@ new Vue({ // eslint-disable-line no-new
     }
   },
   mounted: function () {
-    axios.get(INDEX_PATH)
-      .then(resp => {
-        this.index = resp.data
-        this.rgl_commit = resp.data.commit
-
-        // Build language lookup index
-        for (const lang in resp.data.languages) {
-          for (const module of resp.data.languages[lang]) {
-            if (!this.lookup[module]) this.lookup[module] = []
-            this.lookup[module].push(lang)
-          }
-        }
-
-        this.show.loading = false
-      })
+    this.loadIndex()
+    this.loadSearchIndex()
   },
   methods: {
+    loadIndex: function () {
+      axios.get(INDEX_PATH)
+        .then(resp => {
+          this.index = resp.data
+          this.rgl_commit = resp.data.commit
+
+          // Build language lookup index
+          for (const lang in resp.data.languages) {
+            for (const module of resp.data.languages[lang]) {
+              if (!this.lookup[module]) this.lookup[module] = []
+              this.lookup[module].push(lang)
+            }
+          }
+
+          this.show.loading = false
+        })
+    },
+    loadSearchIndex: function () {
+      this.show.loading = true
+      axios.get(SEARCH_INDEX_PATH)
+        .then(resp => {
+          this.search_index = resp.data
+          this.show.loading = false
+        })
+    },
     selectModule: function (lang, module, ident = null, lines = null) {
       const addToHistory = () => {
         // Store history of idents/line numbers within module history
@@ -248,6 +278,7 @@ new Vue({ // eslint-disable-line no-new
     scrollToLine: function (line) {
       const codeElem = document.querySelector('#code')
       const lineElem = document.querySelector(`#code [data-line-number="${line}"]`)
+      if (!codeElem || !lineElem) return
       codeElem.scrollTo({
         left: 0,
         top: lineElem.parentElement.offsetTop,
@@ -256,3 +287,22 @@ new Vue({ // eslint-disable-line no-new
     }
   }
 })
+
+// Search in a sorted list
+// Returns item on exact match, otherwise false
+function find (data, term, min, max) {
+  if (min === undefined) min = 0
+  if (max === undefined) max = data.length
+  var mid = Math.round((max - min) / 2) + min
+  if (mid > min && mid < max) {
+    var elem = data[mid]
+    if (term === elem.symbol) return elem
+    if (term < elem.symbol) return find(data, term, min, mid)
+    if (term > elem.symbol) return find(data, term, mid, max)
+  } else {
+    for (var m in [min, mid, max]) {
+      if (term === data[m].symbol) return data[m]
+    }
+    return false
+  }
+}

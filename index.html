@@ -64,50 +64,66 @@
       <div class="h-100 p-3">
 
         <!-- Results -->
-        <div class="h-100" v-show="show.results">
-          <div class="float-right">
-            <button class="btn btn-link p-0" @click="show.results = false">
-              <i class="fas fa-times mr-1"></i>
-              Close
+        <div class="row h-100" v-show="show.results">
+          <div class="position-absolute" style="right: 1rem; z-index: 100;">
+            <button class="btn btn-link p-0 text-muted" @click="show.results = false">
+              <i class="fas fa-times mr-1"></i>Close
             </button>
           </div>
-          <div class="row h-100">
-            <div class="col-2 h-100 overflow-y-scroll">
-              <h4 class="h5">Matching modules</h4>
-              <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
-                {{ r.language }}/{{ r.module }}
-              </a>
-            </div>
-            <div class="col-4 h-100 overflow-y-scroll border-left">
-              <h4 class="h5">Matches in scope: <code>{{ current.module }}</code></h4>
-              <table class="table table-sm">
-                <!-- <thead>
-                  <tr>
-                    <th scope="col">Identifier</th>
-                    <th scope="col">Judgement Type</th>
-                    <th scope="col">Module</th>
-                    <th scope="col">Function Type</th>
-                  </tr>
-                </thead> -->
-                <tbody>
-                  <tr v-for="(item,ix) in scope_results" :key="ix">
-                    <td><code class="text-nowrap">{{ item.ident }}</code></td>
-                    <td>{{ item.jtype }}</td>
-                    <td>
-                      <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines)">
-                        {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
-                      </a>
-                    </td>
-                    <td><code>{{ item.ftype }}</code></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="col-6 h-100 overflow-y-scroll border-left">
-              <h4 class="h5">Global search</h4>
-              <button class="btn btn-secondary disabled">Search all modules</button>
-              <em>This will be slow</em>
-            </div>
+          <div class="col-2 h-100 overflow-y-scroll">
+            <h4 class="h5">Matching modules</h4>
+            <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
+              {{ r.language }}/{{ r.module }}
+            </a>
+          </div>
+          <div class="col-4 h-100 overflow-y-scroll border-left">
+            <h4 class="h5">Matches in scope: <code>{{ current.module }}</code></h4>
+            <table class="table table-sm">
+              <!-- <thead>
+                <tr>
+                  <th scope="col">Identifier</th>
+                  <th scope="col">Judgement Type</th>
+                  <th scope="col">Module</th>
+                  <th scope="col">Function Type</th>
+                </tr>
+              </thead> -->
+              <tbody>
+                <tr v-for="(item,ix) in scope_results" :key="ix">
+                  <td><code class="text-nowrap">{{ item.ident }}</code></td>
+                  <td>{{ item.jtype }}</td>
+                  <td>
+                    <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines)">
+                      {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
+                    </a>
+                  </td>
+                  <td><code>{{ item.ftype }}</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-6 h-100 overflow-y-scroll border-left">
+            <h4 class="h5">Global matches: <code>{{ search_term }}</code></h4>
+
+            <table class="table table-sm" v-if="global_results">
+              <!-- <thead>
+                <tr>
+                  <th scope="col">Judgement Type</th>
+                  <th scope="col">Module</th>
+                  <th scope="col">Function Type</th>
+                </tr>
+              </thead> -->
+              <tbody>
+                <tr v-for="(item,ix) in global_results.hits" :key="ix">
+                  <td>{{ item.jtype }}</td>
+                  <td>
+                    <a href="" @click.prevent="selectModule(item.language, item.module, global_results.symbol, item.lines)">
+                      {{ item.language }}/{{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
+                    </a>
+                  </td>
+                  <td><code>{{ item.ftype }}</code></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
