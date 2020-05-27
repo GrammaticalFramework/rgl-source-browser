@@ -31,6 +31,10 @@ new Vue({ // eslint-disable-line no-new
     history: []
   },
   computed: {
+    rgl_commit_short: function () {
+      if (!this.rgl_commit) return ''
+      else return this.rgl_commit.substr(0, 7)
+    },
     cols_history: function () {
       return 2
     },

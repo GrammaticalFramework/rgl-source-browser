@@ -69,7 +69,7 @@ build_tags() {
     # printf "  \"urlprefix\": \"/\",\n" >> "$module_index_tmp"
     printf "  \"tags_path\": \"${tagsdir}\",\n" >> "$module_index_tmp"
     printf "  \"src_path\": \"${srcdir}\",\n" >> "$module_index_tmp"
-    gitsha=$(cd $basedir ; git rev-parse --verify HEAD --short=7)
+    gitsha=$(cd $basedir ; git rev-parse --verify HEAD)
     printf "  \"commit\": \"%s\",\n" "$gitsha" >> "$module_index_tmp"
     printf "  \"languages\": {\n" >> "$module_index_tmp"
     y=0

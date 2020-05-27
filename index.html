@@ -48,10 +48,10 @@
           <i class="fas fa-code"></i>
         </button>
 
-        <a v-if="rgl_commit" class="nav-link text-muted"
-          :href="'https://github.com/GrammaticalFramework/gf-rgl/tree/' + rgl_commit"
-          :title="'RGL commit ' + rgl_commit">
-          <i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit }}
+        <a v-if="rgl_commit" class="nav-link text-muted" target="_blank"
+          :href="`https://github.com/GrammaticalFramework/gf-rgl/tree/${rgl_commit}`"
+          :title="`RGL commit ${rgl_commit_short}`">
+          <i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit_short }}
         </a>
 
         <a class="nav-link text-muted" href="https://github.com/GrammaticalFramework/rgl-source-browser" title="View on GitHub">
@@ -71,13 +71,19 @@
             </button>
           </div>
           <div class="col-2 h-100 overflow-y-scroll">
-            <h4 class="h5">Matching modules</h4>
+            <h4 class="h5">
+              Matching modules
+              <div class="mt-1 smaller text-faint font-weight-normal">Case-insensitive, substring, ≥ 2 chars.</div>
+            </h4>
             <a href="" v-for="(r,ix) in module_results" :key="ix" class="d-block" @click.prevent="selectModule(r.language, r.module)">
               {{ r.language }}/{{ r.module }}
             </a>
           </div>
           <div class="col-4 h-100 overflow-y-scroll border-left">
-            <h4 class="h5">Matches in scope: <code>{{ current.module }}</code></h4>
+            <h4 class="h5">
+              Matches in scope of: <code v-if="current.module">{{ current.module }}</code><em v-else class="text-muted">No module scope loaded</em>
+              <div class="mt-1 smaller text-faint font-weight-normal">Case-insensitive, substring, ≥ 2 chars.</div>
+            </h4>
             <table class="table table-sm">
               <!-- <thead>
                 <tr>
@@ -102,7 +108,10 @@
             </table>
           </div>
           <div class="col-6 h-100 overflow-y-scroll border-left">
-            <h4 class="h5">Global matches: <code>{{ search_term }}</code></h4>
+            <h4 class="h5">
+              Global matches for: <code>{{ search_term }}</code>
+              <div class="mt-1 smaller text-faint font-weight-normal">Case-sensitive, exact match only, ≥ 3 chars.</div>
+            </h4>
 
             <table class="table table-sm" v-if="global_results">
               <!-- <thead>
@@ -180,7 +189,14 @@
 
           <!-- Code -->
           <div :class="'col-'+cols_code" class="h-100 overflow-y-scroll" v-show="show.code" id="code">
-            <h4 class="h5">Code: <code>{{ current.module }}</code></h4>
+            <h4 class="h5">
+              Code: <code>{{ current.module }}</code>
+              <a target="_blank" v-if="current.module" class="float-right"
+                :href="`https://github.com/GrammaticalFramework/gf-rgl/tree/${rgl_commit}/src/${current.language}/${current.module}.gf`"
+                :title="`View ${current.module}.gf@${rgl_commit_short} on GitHub`">
+                <i class="far fa-file-code"></i>
+              </a>
+            </h4>
             <pre class="bg-light p-2 mb-5"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code"></code></pre>
           </div>
         </div>

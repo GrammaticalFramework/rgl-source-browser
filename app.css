@@ -7,3 +7,11 @@
   color: #ccc;
   padding-right: 1rem;
 }
+
+.smaller {
+  font-size: 70%;
+}
+
+.text-faint {
+  color: #aaa;
+}
