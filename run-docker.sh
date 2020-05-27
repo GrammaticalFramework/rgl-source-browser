@@ -7,6 +7,7 @@ if [ "$1" = 'dev' ] || [ "$1" = '--dev' ]; then
 --volume $PWD/index.html:/opt/rgl-source-browser/index.html \
 --volume $PWD/app.js:/opt/rgl-source-browser/app.js \
 --volume $PWD/app.css:/opt/rgl-source-browser/app.css \
+--volume $PWD/build-tags.sh:/opt/rgl-source-browser/build-tags.sh \
 "
 fi
 docker run \
@@ -15,4 +16,5 @@ docker run \
   --rm \
   --publish 5000:5000 \
   ${ARGS} \
+  --name rgl-source-browser \
   rgl-source-browser
