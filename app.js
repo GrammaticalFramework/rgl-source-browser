@@ -251,7 +251,7 @@ new Vue({ // eslint-disable-line no-new
           r.language = bits[bits.length - 2] // english
           const modline = bits[bits.length - 1]
           r.module = modline.slice(0, modline.indexOf('.')) // AdjectiveEng
-          r.lines = modline.slice(modline.indexOf(':') + 1) // 46-53
+          r.lines = modline.indexOf(':') > -1 ? modline.slice(modline.indexOf(':') + 1) : null // 46-53, not always there!
           r.ftype = s[3]
         }
         rs.push(r)
