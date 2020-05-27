@@ -161,6 +161,7 @@
           <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope">
             <h4 class="h5">Full scope: <code>{{ current.module }}</code></h4>
             <em class="text-muted" v-show="!current.scope">No module scope loaded</em>
+            <div class="alert alert-danger mt-2" v-show="error.scope">{{ error.scope }}</div>
             <div class="table-responsive">
               <table class="table table-sm">
                 <!-- <thead>
@@ -188,7 +189,7 @@
           </div>
 
           <!-- Code -->
-          <div :class="'col-'+cols_code" class="h-100 overflow-y-scroll" v-show="show.code" id="code">
+          <div :class="'col-'+cols_code" class="h-100 overflow-y-scroll pb-5" v-show="show.code" id="code">
             <h4 class="h5">
               Code: <code>{{ current.module }}</code>
               <a target="_blank" v-if="current.module" class="float-right"
@@ -197,7 +198,8 @@
                 <i class="far fa-file-code"></i>
               </a>
             </h4>
-            <pre class="bg-light p-2 mb-5"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code"></code></pre>
+            <pre class="bg-light p-2"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code"></code></pre>
+            <div class="alert alert-danger mt-2" v-show="error.code">{{ error.code }}</div>
           </div>
         </div>
 

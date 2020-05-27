@@ -28,6 +28,10 @@ new Vue({ // eslint-disable-line no-new
       scope: null,
       code: null
     },
+    error: {
+      scope: null,
+      code: null
+    },
     history: []
   },
   computed: {
@@ -194,6 +198,8 @@ new Vue({ // eslint-disable-line no-new
       }
       this.current.scope = null
       this.current.code = null
+      this.error.scope = null
+      this.error.code = null
       this.show.loading = true
       Promise.all([
         axios.get(`${this.index.tags_path}/${module}.gf-tags`)
@@ -201,7 +207,7 @@ new Vue({ // eslint-disable-line no-new
             this.current.scope = this.processTags(resp.data)
           })
           .catch(err => {
-            console.error(err)
+            this.error.scope = err
             this.current.scope = null
           }),
         axios.get(`${this.index.src_path}/${lang}/${module}.gf`)
@@ -209,7 +215,7 @@ new Vue({ // eslint-disable-line no-new
             this.current.code = resp.data
           })
           .catch(err => {
-            console.error(err)
+            this.error.code = err
             this.current.code = null
           })
       ]).then(() => {
