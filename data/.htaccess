@@ -1,1 +1,8 @@
-SetOutputFilter DEFLATE
+<ifmodule mod_deflate.c>
+  SetOutputFilter DEFLATE
+</ifmodule>
+
+<ifmodule mod_expires.c>
+  ExpiresActive on
+  ExpiresDefault "access plus 2 hours"
+</ifmodule>
