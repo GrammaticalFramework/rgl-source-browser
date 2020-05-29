@@ -145,13 +145,14 @@
             <em class="text-muted" v-show="!history.length">No recent modules</em>
             <div v-for="(item,ix) in history_reversed" :key="ix">
               <a href="" @click.prevent="selectModule(item.language, item.module)"
-              class="d-block px-2 py-1 rounded"
+              class="d-block px-2 py-1 rounded text-truncate"
               :class="{ 'bg-primary text-white mb-1' : ix === 0 }">
                 {{ item.language }}/{{ item.module }}
                 <span v-if="ix === 0" class="float-right">&rarr;</span>
               </a>
-              <a v-for="(loc,iy) in item.locations" :key="iy" class="d-block ml-3 small text-secondary"
-              href=""  @click.prevent="selectModule(item.language, item.module, loc.ident, loc.lines)">
+              <a v-for="(loc,iy) in item.locations" :key="iy"
+              href=""  @click.prevent="selectModule(item.language, item.module, loc.ident, loc.lines)"
+              class="d-block ml-3 small text-secondary text-truncate">
                 <code>{{ loc.ident }}</code>:{{ loc.lines }}
               </a>
             </div>

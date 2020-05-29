@@ -6,13 +6,13 @@ const SEARCH_INDEX_PATH = 'data/search.json'
 
 const defaultLangs = ['abstract', 'api', 'common', 'prelude']
 
-new Vue({ // eslint-disable-line no-new
+const app = new Vue({
   el: '#app',
   data: {
-    index: null,
-    search_index: null,
+    index: null, // loaded from index.jsn
+    search_index: null, // loaded from search.json
     lookup: [],
-    rgl_commit: null,
+    rgl_commit: null, // sha
     search_term: null, // linked to input
     search_terms: [], // internal, processed
     show: {
@@ -129,8 +129,11 @@ new Vue({ // eslint-disable-line no-new
         this.show.results = true
       }
     },
-    'current.code': function () {
-      Vue.nextTick(this.highlightCode)
+    'current.code': function (newVal, oldVal) {
+      // This is called twice, once when clearing old and again when new is loaded
+      if (newVal) {
+        Vue.nextTick(this.highlightCode)
+      }
     }
   },
   mounted: function () {
@@ -163,7 +166,25 @@ new Vue({ // eslint-disable-line no-new
           this.show.loading = false
         })
     },
+    // Called directly by page anchors, pushes onto browser history
     selectModule: function (lang, module, ident = null, lines = null) {
+      // Push browser history state
+      let href = `#!${lang}/${module}`
+      if (lines) href += `:${lines}`
+      window.history.pushState(
+        {
+          language: lang,
+          module: module,
+          ident: ident,
+          lines: lines
+        }, // state
+        null, // title
+        href // url
+      )
+      this.loadModule(lang, module, ident, lines)
+    },
+    // Does work of loading module scope and code
+    loadModule: function (lang, module, ident = null, lines = null) {
       const addToHistory = () => {
         // Store history of idents/line numbers within module history
         let histItem
@@ -229,6 +250,12 @@ new Vue({ // eslint-disable-line no-new
           this.scrollToLine(parseInt(lines))
         }
       })
+    },
+    clearCurrent: function () {
+      this.current.language = null
+      this.current.module = null
+      this.current.scope = null
+      this.current.code = null
     },
     processTags: function (raw) {
       const rs = []
@@ -316,3 +343,19 @@ function find (data, term, min, max) {
     return false
   }
 }
+
+// Triggered by browser action (back/forward), NOT history.pushState()
+window.addEventListener('popstate', (event) => {
+  const s = event.state
+  if (s) {
+    app.loadModule(s.language, s.module, s.ident, s.lines)
+  } else if (window.location.hash) {
+    // Read from URL
+    const m = window.location.hash.match(/#!(\w+)\/(\w+)(?::(.+))?/)
+    if (m) {
+      app.loadModule(m[1], m[2], null, m[3] || null)
+    }
+  } else {
+    app.clearCurrent()
+  }
+})
