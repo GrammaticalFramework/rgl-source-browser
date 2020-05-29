@@ -19,6 +19,7 @@ RUN git clone https://github.com/GrammaticalFramework/gf-rgl.git
 # Copy RGL browser and build tags
 WORKDIR /opt/rgl-source-browser
 COPY * /opt/rgl-source-browser/
+ENV LC_ALL=C.UTF-8
 ENV OS=gnu
 ENV GF_RGL=/opt/gf-rgl
 RUN ./build-tags.sh

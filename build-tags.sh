@@ -63,6 +63,16 @@ mkdir -p "$srcdir"
 
 # Iterate and build all the tags
 build_tags() {
+    echo "Copying sources..."
+    for fulldir in "$basedir"/*
+    do
+        dir=$(basename "$fulldir")
+        if ! in_ignore "$dir" && [ -d "$fulldir" ] ; then
+            mkdir -p "${srcdir}/${dir}"
+            cp -r "$fulldir"/*.gf "${srcdir}/${dir}/"
+        fi
+    done
+
     echo "Building tags..."
     rm -f "$module_index_tmp"
     printf "{\n" >> "$module_index_tmp"
@@ -79,8 +89,8 @@ build_tags() {
     do
         dir=$(basename "$fulldir")
         if ! in_ignore "$dir" && [ -d "$fulldir" ] ; then
-            mkdir -p "${srcdir}/${dir}"
-            cp -r "$fulldir"/*.gf "${srcdir}/${dir}/"
+            # mkdir -p "${srcdir}/${dir}"
+            # cp -r "$fulldir"/*.gf "${srcdir}/${dir}/"
             if ((y > 0)); then printf ",\n" >> "$module_index_tmp" ; fi
             printf "    \"%s\": [\n" "$dir" >> "$module_index_tmp"
             x=0
