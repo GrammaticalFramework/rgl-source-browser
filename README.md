@@ -2,6 +2,8 @@
 
 Web-based tool for browsing the GF's resource grammar library (RGL).
 
+![Screenshot of RGL browser](screenshot.png)
+
 ## Live
 
 This tool is hosted live [here](http://www.grammaticalframework.org/~john/rgl-browser/),
