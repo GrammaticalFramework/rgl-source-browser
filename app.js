@@ -137,11 +137,8 @@ const app = new Vue({
     }
   },
   mounted: function () {
-    this.loadIndex()
-    this.loadSearchIndex()
-  },
-  methods: {
-    loadIndex: function () {
+    // Load indexes
+    Promise.all([
       axios.get(INDEX_PATH)
         .then(resp => {
           this.index = resp.data
@@ -154,18 +151,19 @@ const app = new Vue({
               this.lookup[module].push(lang)
             }
           }
-
-          this.show.loading = false
-        })
-    },
-    loadSearchIndex: function () {
-      this.show.loading = true
+        }),
       axios.get(SEARCH_INDEX_PATH)
         .then(resp => {
           this.search_index = resp.data
-          this.show.loading = false
         })
-    },
+    ]).then(() => {
+      this.show.loading = false
+      if (window.location.hash) {
+        this.loadModuleFromHash(window.location.hash)
+      }
+    })
+  },
+  methods: {
     // Called directly by page anchors, pushes onto browser history
     selectModule: function (lang, module, ident = null, lines = null) {
       // Push browser history state
@@ -182,6 +180,13 @@ const app = new Vue({
         href // url
       )
       this.loadModule(lang, module, ident, lines)
+    },
+    // Called on browser history popstate and page load
+    loadModuleFromHash: function (hash) {
+      const m = hash.match(/#!(\w+)\/(\w+)(?::(.+))?/)
+      if (m) {
+        this.loadModule(m[1], m[2], null, m[3] || null)
+      }
     },
     // Does work of loading module scope and code
     loadModule: function (lang, module, ident = null, lines = null) {
@@ -350,11 +355,7 @@ window.addEventListener('popstate', (event) => {
   if (s) {
     app.loadModule(s.language, s.module, s.ident, s.lines)
   } else if (window.location.hash) {
-    // Read from URL
-    const m = window.location.hash.match(/#!(\w+)\/(\w+)(?::(.+))?/)
-    if (m) {
-      app.loadModule(m[1], m[2], null, m[3] || null)
-    }
+    app.loadModuleFromHash(window.location.hash)
   } else {
     app.clearCurrent()
   }

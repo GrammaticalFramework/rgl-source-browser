@@ -54,7 +54,7 @@
           <i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit_short }}
         </a>
 
-        <a class="nav-link text-muted" href="https://github.com/GrammaticalFramework/rgl-source-browser" title="View on GitHub">
+        <a class="nav-link text-muted" href="https://github.com/GrammaticalFramework/rgl-source-browser" target="_blank" title="View on GitHub">
           <i class="fab fa-github"></i>
         </a>
 
@@ -66,7 +66,7 @@
         <!-- Results -->
         <div class="row h-100" v-show="show.results">
           <div class="position-absolute" style="right: 1rem; z-index: 100;">
-            <button class="btn btn-link p-0 text-muted" @click="show.results = false">
+            <button class="btn btn-link bg-white border text-muted" @click="show.results = false">
               <i class="fas fa-times mr-1"></i>Close
             </button>
           </div>
@@ -102,7 +102,7 @@
                       {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                     </a>
                   </td>
-                  <td><code>{{ item.ftype }}</code></td>
+                  <td class="text-nowrap"><code>{{ item.ftype }}</code></td>
                 </tr>
               </tbody>
             </table>
@@ -129,7 +129,7 @@
                       {{ item.language }}/{{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                     </a>
                   </td>
-                  <td><code>{{ item.ftype }}</code></td>
+                  <td class="text-nowrap"><code>{{ item.ftype }}</code></td>
                 </tr>
               </tbody>
             </table>
@@ -182,7 +182,7 @@
                         {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                       </a>
                     </td>
-                    <td><code>{{ item.ftype }}</code></td>
+                    <td class="text-nowrap"><code>{{ item.ftype }}</code></td>
                   </tr>
                 </tbody>
               </table>
