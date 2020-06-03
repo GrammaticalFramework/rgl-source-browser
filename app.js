@@ -165,7 +165,7 @@ const app = new Vue({
   },
   methods: {
     // Called directly by page anchors, pushes onto browser history
-    selectModule: function (lang, module, ident = null, lines = null) {
+    selectModule: function (lang, module, ident = null, lines = null, scrollScope = true) {
       // Push browser history state
       let href = `#!${lang}/${module}`
       if (lines) href += `:${lines}`
@@ -179,7 +179,7 @@ const app = new Vue({
         null, // title
         href // url
       )
-      this.loadModule(lang, module, ident, lines)
+      this.loadModule(lang, module, ident, lines, scrollScope)
     },
     // Called on browser history popstate and page load
     loadModuleFromHash: function (hash) {
@@ -189,7 +189,7 @@ const app = new Vue({
       }
     },
     // Does work of loading module scope and code
-    loadModule: function (lang, module, ident = null, lines = null) {
+    loadModule: function (lang, module, ident = null, lines = null, scrollScope = true) {
       const addToHistory = () => {
         // Store history of idents/line numbers within module history
         let histItem
@@ -218,7 +218,10 @@ const app = new Vue({
       if (lang === this.current.language && module === this.current.module) {
         if (lines) {
           addToHistory()
-          this.scrollToLine(parseInt(lines))
+          Vue.nextTick(() => this.scrollToCodeLine(parseInt(lines)))
+        }
+        if (ident && scrollScope) {
+          Vue.nextTick(() => this.scrollToScopeIdent(ident))
         }
         return
       }
@@ -252,7 +255,10 @@ const app = new Vue({
         this.show.loading = false
 
         if (lines) {
-          this.scrollToLine(parseInt(lines))
+          this.scrollToCodeLine(parseInt(lines))
+        }
+        if (ident && scrollScope) {
+          this.scrollToScopeIdent(ident)
         }
       })
     },
@@ -317,14 +323,24 @@ const app = new Vue({
       hljs.highlightBlock(elem)
       if (hljs.lineNumbersBlock) hljs.lineNumbersBlock(elem)
     },
-    scrollToLine: function (line) {
+    scrollToScopeIdent: function (ident) {
+      const scopeElem = document.querySelector('#scope')
+      const identElem = document.querySelector(`#scope [data-ident="${ident}"]`)
+      if (!scopeElem || !identElem) return
+      scopeElem.scrollTo({
+        left: 0,
+        top: identElem.offsetTop,
+        behavior: 'smooth'
+      })
+    },
+    scrollToCodeLine: function (line) {
       const codeElem = document.querySelector('#code')
       const lineElem = document.querySelector(`#code [data-line-number="${line}"]`)
       if (!codeElem || !lineElem) return
       codeElem.scrollTo({
         left: 0,
         top: lineElem.parentElement.offsetTop,
-        behavior: 'auto' // jump
+        behavior: 'smooth'
       })
     }
   }

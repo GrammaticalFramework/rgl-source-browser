@@ -159,7 +159,7 @@
           </div>
 
           <!-- Scope -->
-          <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope">
+          <div :class="'col-'+cols_scope" class="h-100 overflow-y-scroll" v-show="show.scope" id="scope">
             <h4 class="h5">Full scope: <code>{{ current.module }}</code></h4>
             <em class="text-muted" v-show="!current.scope">No module scope loaded</em>
             <div class="alert alert-danger mt-2" v-show="error.scope">{{ error.scope }}</div>
@@ -174,11 +174,11 @@
                   </tr>
                 </thead> -->
                 <tbody>
-                  <tr v-for="(item,ix) in current.scope" :key="ix">
+                  <tr v-for="(item,ix) in current.scope" :key="ix" :data-ident="item.ident">
                     <td><code class="text-nowrap">{{ item.ident }}</code></td>
                     <td>{{ item.jtype }}</td>
                     <td>
-                      <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines)">
+                      <a href="" @click.prevent="selectModule(item.language, item.module, item.ident, item.lines, false)">
                         {{ item.module }}<span v-if="item.lines">:{{ item.lines }}</span>
                       </a>
                     </td>
