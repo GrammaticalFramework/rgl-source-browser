@@ -16,13 +16,16 @@ RUN rm -f ${GF_FILENAME}
 WORKDIR /opt
 RUN git clone https://github.com/GrammaticalFramework/gf-rgl.git
 
-# Copy RGL browser and build tags
+# Build tags
 WORKDIR /opt/rgl-source-browser
-COPY * /opt/rgl-source-browser/
+COPY build-tags.sh .
 ENV LC_ALL=C.UTF-8
 ENV OS=gnu
 ENV GF_RGL=/opt/gf-rgl
 RUN ./build-tags.sh
+
+# Copy RGL browser
+COPY * ./
 
 # Serve
 EXPOSE 5000
