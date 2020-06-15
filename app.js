@@ -342,6 +342,10 @@ const app = new Vue({
         top: lineElem.parentElement.offsetTop,
         behavior: 'smooth'
       })
+    },
+    focusInput: function (e) {
+      e.target.select()
+      this.show.results = Boolean(this.search_term)
     }
   }
 })
