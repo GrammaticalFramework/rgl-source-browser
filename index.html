@@ -64,7 +64,10 @@
       <div class="h-100 px-3">
 
         <!-- Results -->
-        <div class="row h-100" v-show="show.results">
+        <div
+          class="row m-0 position-absolute bg-white border-left border-right border-bottom shadow-lg"
+          style="width: calc(100% - 6rem); left: 3rem; height: calc(100% - 8rem); z-index: 100;"
+          v-show="show.results">
           <div class="position-absolute mt-3" style="right: 1rem; z-index: 100;">
             <button class="btn btn-link bg-white border text-muted" @click="show.results = false">
               <i class="fas fa-times mr-1"></i>Close
@@ -140,7 +143,7 @@
         </div>
 
         <!-- Scope & Code -->
-        <div class="row h-100" v-show="!show.results">
+        <div class="row h-100" :style="{ opacity: show.results ? 0.3 : 1.0 }">
 
           <!-- History -->
           <div :class="'col-'+cols_history" class="h-100 py-3 overflow-y-scroll" v-show="show.history">
