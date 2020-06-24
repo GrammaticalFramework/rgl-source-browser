@@ -196,7 +196,6 @@ const app = new Vue({
         const histItemIx = this.history.findIndex(h => h.language === lang && h.module === module)
         if (histItemIx > -1) {
           histItem = this.history[histItemIx]
-          this.history.splice(histItemIx, 1)
           if (lines && histItem.locations.findIndex(l => l.lines === lines) < 0) {
             histItem.locations.push({
               ident: ident,
@@ -210,8 +209,15 @@ const app = new Vue({
             module: module,
             locations: []
           }
+          this.history.push(histItem)
+          this.history.sort((a, b) => {
+            if (a.language === b.language) {
+              return a.module < b.module ? 1 : -1
+            } else {
+              return a.language < b.language ? 1 : -1
+            }
+          })
         }
-        this.history.push(histItem)
       }
 
       this.show.results = false
