@@ -51,7 +51,7 @@
         <a v-if="rgl_commit" class="nav-link text-muted" target="_blank"
           :href="`https://github.com/GrammaticalFramework/gf-rgl/tree/${rgl_commit}`"
           :title="`RGL commit ${rgl_commit_short}`">
-          <i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit_short }}
+          RGL<i class="mx-1 fas fa-code-branch"></i>{{ rgl_commit_short }}
         </a>
 
         <a class="nav-link text-muted" href="https://github.com/GrammaticalFramework/rgl-source-browser" target="_blank" title="View on GitHub">
@@ -167,7 +167,7 @@
 
           <!-- Scope -->
           <div :class="'col-'+cols_scope" class="h-100 py-3 overflow-y-scroll border-left" v-show="show.scope" id="scope">
-            <h4 class="h5">Full scope: <code>{{ current.module }}</code></h4>
+            <h4 class="h5">Full scope: <code>{{ current.language }}/{{ current.module }}</code></h4>
             <em class="text-muted" v-show="!current.scope">No module scope loaded</em>
             <div class="alert alert-danger mt-2" v-show="error.scope">{{ error.scope }}</div>
             <table class="table table-sm">
@@ -198,14 +198,14 @@
           <!-- Code -->
           <div :class="'col-'+cols_code" class="h-100 py-3 overflow-y-scroll border-left" v-show="show.code" id="code">
             <h4 class="h5">
-              Code: <code>{{ current.module }}</code>
+              Code: <code>{{ current.language }}/{{ current.module }}</code>
               <a target="_blank" v-if="current.module" class="float-right"
                 :href="`https://github.com/GrammaticalFramework/gf-rgl/tree/${rgl_commit}/src/${current.language}/${current.module}.gf`"
                 :title="`View ${current.module}.gf@${rgl_commit_short} on GitHub`">
                 <i class="far fa-file-code"></i>
               </a>
             </h4>
-            <pre class="bg-light p-2"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code"></code></pre>
+            <pre class="bg-light p-2"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code" @click.meta="codeClick"></code></pre>
             <div class="alert alert-danger mt-2" v-show="error.code">{{ error.code }}</div>
             <div style="height: 3rem"><!-- spacer --></div>
           </div>

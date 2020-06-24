@@ -241,7 +241,7 @@ const app = new Vue({
           }),
         axios.get(`${this.index.src_path}/${lang}/${module}.gf`)
           .then(resp => {
-            this.current.code = resp.data
+            this.current.code = resp.data.replace(/\t/g, '        ') // 8 spaces, default CSS tab-size
           })
           .catch(err => {
             this.error.code = err
@@ -346,9 +346,53 @@ const app = new Vue({
     focusInput: function (e) {
       e.target.select()
       this.show.results = Boolean(this.search_term)
+    },
+    codeClick: function (ev) {
+      const elem = ev.path[0]
+      const text = elem.innerText
+      let token
+      const tokens = text.trim().split(/\s+/)
+      if (tokens.length === 1) {
+        // if single token, just use that
+        token = tokens[0]
+      } else {
+        // get char width from first span in code
+        const e1 = document.querySelector('#code span.hljs-type')
+        const charWidth = e1.getBoundingClientRect().width / e1.innerText.length
+
+        // calculate token under cursor
+        const boundaryRegex = /\W/
+        const offset = ev.clientX - elem.getBoundingClientRect().x // from left edge of parent container to cursor
+        const index = Math.floor(offset / charWidth) // character under cursor
+        const tokenStartIndex = searchLast(text.slice(0, index), boundaryRegex)
+        const tokenEndIndex = text.slice(index).search(boundaryRegex)
+        token = text.slice(
+          tokenStartIndex > -1 ? tokenStartIndex + 1 : 0,
+          tokenEndIndex > -1 ? tokenEndIndex + index : text.length
+        )
+      }
+      if (token) {
+        // search in current scope and jump if found
+        for (const item of this.current.scope) {
+          if (item.ident === token) {
+            this.selectModule(item.language, item.module, item.ident, item.lines)
+            return
+          }
+        }
+      }
     }
   }
 })
+
+// Like String.prototype.search but finds the last match
+function searchLast (s, patt) {
+  const m = s.search(patt)
+  if (m === -1) return -1
+  else {
+    const m2 = searchLast(s.slice(m + 1), patt)
+    return (m2 === -1) ? m : (m2 + m + 1)
+  }
+}
 
 // Search in a sorted list
 // Returns item on exact match, otherwise false
