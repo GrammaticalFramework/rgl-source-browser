@@ -2,7 +2,6 @@
 #
 # Script for building tags files for all RGL
 # Path to RGL repository must be provided via GF_RGL
-# John J. Camilleri, 2018
 
 datadir="data"
 tagsdir="${datadir}/tags"
@@ -130,7 +129,14 @@ replace_paths() {
     echo "Replacing paths..."
     # Z:/Users/john/repositories/gf-rgl/src
     fakewindir="Z:${basedir}"
-    sed -i.bak -e "s!${basedir}/!!" -e "s!${tagsdir}/!!" -e 's!\\!/!g' -e "s!${fakewindir}/!!" "$tagsdir"/*.gf-tags
+    abssrcdir="$(pwd)/${srcdir}"
+    sed -i.bak \
+        -e "s!${basedir}/!!" \
+        -e "s!${tagsdir}/!!" \
+        -e "s!${abssrcdir}/!!" \
+        -e 's!\\!/!g' \
+        -e "s!${fakewindir}/!!" \
+        "$tagsdir"/*.gf-tags
     rm -f "$tagsdir"/*.gf-tags.bak
 }
 
