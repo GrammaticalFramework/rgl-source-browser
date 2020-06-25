@@ -1,4 +1,4 @@
-/* global Vue axios hljs */
+/* global Vue axios hljs requestAnimationFrame */
 
 // Path to data
 const INDEX_PATH = 'data/index.json'
@@ -261,7 +261,7 @@ const app = new Vue({
         this.show.loading = false
 
         if (lines) {
-          this.scrollToCodeLine(parseInt(lines))
+          doubleRaf(() => this.scrollToCodeLine(parseInt(lines)))
         }
         if (ident && scrollScope) {
           this.scrollToScopeIdent(ident)
@@ -430,3 +430,10 @@ window.addEventListener('popstate', (event) => {
     app.clearCurrent()
   }
 })
+
+// https://github.com/vuejs/vue/issues/9200#issuecomment-468512304
+function doubleRaf (callback) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(callback)
+  })
+}
