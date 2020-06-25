@@ -129,7 +129,7 @@ replace_paths() {
     echo "Replacing paths..."
     # Z:/Users/john/repositories/gf-rgl/src
     fakewindir="Z:${basedir}"
-    abssrcdir="$(pwd)/${srcdir}"
+    abssrcdir="$(pwd -P)/${srcdir}"
     sed -i.bak \
         -e "s!${basedir}/!!" \
         -e "s!${tagsdir}/!!" \
