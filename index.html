@@ -204,6 +204,10 @@
                 :title="`View ${current.module}.gf@${rgl_commit_short} on GitHub`">
                 <i class="far fa-file-code"></i>
               </a>
+              <div class="mt-1 smaller text-faint font-weight-normal">
+                <span class="badge badge-danger">New</span>
+                Use ⌘/⊞-click to jump to a defintion.
+              </div>
             </h4>
             <pre class="bg-light p-2"><em class="text-muted" v-show="!current.code">No module code loaded</em><code class="haskell" v-html="current.code" @click.meta="codeClick"></code></pre>
             <div class="alert alert-danger mt-2" v-show="error.code">{{ error.code }}</div>
